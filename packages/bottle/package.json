@@ -1,0 +1,28 @@
+{
+  "name": "@zhengxs/bottle",
+  "version": "0.1.0",
+  "author": "zhengxs2018",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --mode development --watch",
+    "clean:bundle": "rimraf dist",
+    "prepublishOnly": "pnpm clean:bundle && pnpm build"
+  },
+  "peerDependencies": {
+    "cookies": ">=0.9.0"
+  },
+  "peerDependenciesMeta": {
+    "cookies": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/cookies": "^0.9.0",
+    "@zhengxs/tsconfig": "workspace:^",
+    "cookies": "^0.9.1"
+  }
+}

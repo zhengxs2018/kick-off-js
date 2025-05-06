@@ -1,0 +1,4 @@
+{
+  "extends": "@zhengxs/tsconfig/lib",
+  "include": ["src"]
+}

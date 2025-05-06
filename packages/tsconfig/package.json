@@ -1,0 +1,13 @@
+{
+  "name": "@zhengxs/tsconfig",
+  "version": "0.1.0",
+  "description": "zhengxs - tsconfig",
+  "author": "zhengxs2018",
+  "license": "MIT",
+  "sideEffects": false,
+  "files": [
+    "base.json",
+    "dom.json",
+    "lib.json"
+  ]
+}

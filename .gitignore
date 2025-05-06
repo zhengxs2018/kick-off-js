@@ -1,0 +1,34 @@
+.DS_store
+.history
+
+node_modules
+
+# git features
+.mailmap
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+# .vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# build artifacts
+dist
+.turbo
+
+yarn.lock
+pnpm-lock.yaml
+package-lock.json

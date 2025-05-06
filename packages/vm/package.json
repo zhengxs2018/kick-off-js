@@ -1,0 +1,26 @@
+{
+  "name": "@zhengxs/vm",
+  "version": "0.1.0",
+  "description": "zhengxs - tsconfig",
+  "author": "zhengxs2018",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --mode development --watch",
+    "clean:bundle": "rimraf dist",
+    "prepublishOnly": "pnpm clean:bundle && pnpm build"
+  },
+  "dependencies": {
+    "@zhengxs/shared": "workspace:^"
+  },
+  "devDependencies": {
+    "@zhengxs/tsconfig": "workspace:^"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "kick-off-js",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "author": "zhengxs2018",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "format": "prettier --write ."
+  },
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "prettier": "^2.5.1",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vite": "^4.4.11",
+    "vite-plugin-checker": "^0.6.4",
+    "vite-plugin-dts": "^3.6.0",
+    "vite-plugin-externalize-deps": "^0.7.0"
+  }
+}
