@@ -1,32 +1,25 @@
 # @zhengxs/vm
 
-> 🧪 未发布
-
-在浏览器中运行的 JS 沙箱
+基于 Proxy 的浏览器沙箱，确保动态运行的代码，不会污染全局环境。
 
 ## 使用
 
 ```ts
-import { createRequireContext, Script } from '@zhengxs/vm'
+import { runInNewContext } from '@zhengxs/vm'
 
-const code = `
-  exports.print = function () {
-    console.log('上下文变量：', 'hello,sandbox')
-  }
-`
+window.globalVar = 3
 
-const vm = new Script(code, {
-  inject: ['module', 'exports'],
-})
+const context = {
+  globalVar: 1,
+}
 
-// 模拟 commonjs 上下文
-const context = createRequireContext()
+runInNewContext('globalVar *= 2, context)
 
-// 执行上下文
-vm.runInContext(context)
+console.log(context)
+// Prints: { globalVar: 2 }
 
-// 调用内部导出的函数
-context.module.print()
+console.log(window.globalVar)
+// Prints: 3
 ```
 
 ## License
