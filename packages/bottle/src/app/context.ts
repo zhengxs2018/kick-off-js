@@ -54,6 +54,6 @@ export interface Context extends AppContext {
   req: IncomingMessage
   res: ServerResponse<IncomingMessage>
 
-  provides: Record<string | number | symbol, unknown>
+  provides: Record<PropertyKey, unknown>
   subscriptions: DisposableLike[]
 }
