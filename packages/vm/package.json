@@ -1,7 +1,7 @@
 {
   "name": "@zhengxs/vm",
   "version": "0.1.0",
-  "description": "zhengxs - tsconfig",
+  "description": "zhengxs - A browser sandbox based on Proxy",
   "author": "zhengxs2018",
   "license": "MIT",
   "sideEffects": false,
@@ -14,8 +14,10 @@
   "scripts": {
     "build": "vite build",
     "watch": "vite build --mode development --watch",
-    "clean:bundle": "rimraf dist",
-    "prepublishOnly": "pnpm clean:bundle && pnpm build"
+    "format": "prettier src samples --write --log-level warn",
+    "clean:bundle": "rimraf dist dist-types",
+    "prepublishOnly": "pnpm build && clean-publish",
+    "postpublish": "rimraf ./package"
   },
   "dependencies": {
     "@zhengxs/shared": "workspace:^"

@@ -11,7 +11,7 @@
 | [vm](./packages/vm/README.md)             | N/A                                            | 浏览器 | 基于 Proxy 的浏览器沙箱     |
 | extension-host                            | N/A                                            | 浏览器 | 在浏览器中使用的拓展环境    |
 
-## 启动项目
+## 本地启动
 
 1. 使用 **vscode** 打开项目
 2. 进入到子模块的 `samples` 目录

@@ -13,7 +13,7 @@ const context = {
   globalVar: 1,
 }
 
-runInNewContext('globalVar *= 2, context)
+runInNewContext('globalVar *= 2, context')
 
 console.log(context)
 // Prints: { globalVar: 2 }
