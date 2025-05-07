@@ -20,7 +20,7 @@ export function createApp(config?: AppConfig) {
   const provides = Object.create(null)
   const middleares: Middleware[] = []
 
-  function provide(key: symbol | string | number, value: unknown) {
+  function provide(key: PropertyKey, value: unknown) {
     if (key in provides) {
       throw new Error(`Injection key "${String(key)}" already exists.`)
     }

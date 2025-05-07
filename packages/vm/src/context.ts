@@ -1,10 +1,8 @@
-import type { Dict } from '@zhengxs/shared'
-
 // Note: 防止在嵌套的情况下，window 变量被覆盖
 const globalThis = (0, eval)('window')
 const contextSymbolKey = Symbol('sandbox#context')
 
-export interface Context extends Dict {}
+export interface Context extends Record<PropertyKey, unknown> {}
 
 export function isContext(o: unknown): o is Context {
   return !!o && (o as any)[contextSymbolKey] === true

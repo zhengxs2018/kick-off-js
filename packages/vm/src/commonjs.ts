@@ -1,14 +1,12 @@
-import type { Dict } from '@zhengxs/shared'
 import { createContext } from './context.js'
 
-export type RequireContext<
-  Exports extends Dict = Dict,
-  Context extends Dict = Dict
-> = { module: Exports } & Context
+export type RequireContext<Exports extends object, Context extends object> = {
+  module: Exports
+} & Context
 
 export function createRequireContext<
-  Exports extends Dict,
-  Context extends Dict
+  Exports extends object,
+  Context extends object
 >(contextifiedObject?: Context) {
   const mod = { exports: {} }
 
