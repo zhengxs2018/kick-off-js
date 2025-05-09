@@ -4,12 +4,15 @@
 
 ## 项目一览
 
-| 名称 版本                                 | 版本                                           | 环境   | 介绍                        |
-| ----------------------------------------- | ---------------------------------------------- | ------ | --------------------------- |
-| [bottle](./packages/bottle/README.md)     | N/A                                            | NodeJS | React Hooks 风格的 Web 框架 |
-| [tsconfig](./packages/tsconfig/README.md) | [![][tsconfig-npm-version]][tsconfig-npm-link] | NodeJS | 共享的 tsconfig 配置        |
-| [vm](./packages/vm/README.md)             | N/A                                            | 浏览器 | 基于 Proxy 的浏览器沙箱     |
-| extension-host                            | N/A                                            | 浏览器 | 在浏览器中使用的拓展环境    |
+| 名称 版本                                 | 版本                                           | 环境           | 介绍                               |
+| ----------------------------------------- | ---------------------------------------------- | -------------- | ---------------------------------- |
+| cate                                      | N/A                                            | 浏览器         | 在浏览器中使用的拓展环境           |
+| [request](./packages/request/README.md)   | N/A                                            | 浏览器, 小程序 | 让 h5 和 微信小程序 都支持流式响应 |
+| [vm](./packages/vm/README.md)             | N/A                                            | 浏览器         | 基于 Proxy 的浏览器沙箱            |
+| [bottle](./packages/bottle/README.md)     | N/A                                            | NodeJS         | React Hooks 风格的 Web 框架        |
+| [ufetch](./packages/ufetch/README.md)     | [![][npm-ufetch-version]][npm-ufetch-link]     | N/A            | 让微信小程序的也支持流式传输           |
+| [shared](./packages/shared/README.md)     | [![][npm-shared-version]][npm-shared-link]     | N/A            | 共享的通用函数                     |
+| [tsconfig](./packages/tsconfig/README.md) | [![][npm-tsconfig-version]][npm-tsconfig-link] | NodeJS         | 共享的 tsconfig 配置               |
 
 ## 本地启动
 
@@ -23,5 +26,9 @@
 
 MIT
 
-[tsconfig-npm-version]: https://img.shields.io/npm/v/@zhengxs/tsconfig?color=369eff&labelColor=black&logo=npm&logoColor=white&style=flat-square
-[tsconfig-npm-link]: https://www.npmjs.com/package/@zhengxs/ai
+[npm-tsconfig-version]: https://img.shields.io/npm/v/@zhengxs/tsconfig?color=369eff&labelColor=black&logo=npm&logoColor=white&style=flat-square
+[npm-tsconfig-link]: https://www.npmjs.com/package/@zhengxs/tsconfig
+[npm-ufetch-version]: https://img.shields.io/npm/v/@zhengxs/ufetch?color=369eff&labelColor=black&logo=npm&logoColor=white&style=flat-square
+[npm-ufetch-link]: https://www.npmjs.com/package/@zhengxs/ufetch
+[npm-shared-version]: https://img.shields.io/npm/v/@zhengxs/shared?color=369eff&labelColor=black&logo=npm&logoColor=white&style=flat-square
+[npm-shared-link]: https://www.npmjs.com/package/@zhengxs/shared

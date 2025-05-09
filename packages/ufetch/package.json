@@ -1,0 +1,81 @@
+{
+  "name": "@zhengxs/ufetch",
+  "version": "0.1.0",
+  "description": "zhengxs - A request toolkit",
+  "author": "zhengxs2018",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist-types/index.d.ts",
+  "sideEffects": [
+    "./dist/_shims/index.js",
+    "./dist/_shims/registry.js",
+    "./dist/_shims/uni.js"
+  ],
+  "exports": {
+    "./shims": {
+      "types": "./dist-types/_shims/index.d.ts",
+      "default": "./dist/_shims/index.js"
+    },
+    "./shims/*": {
+      "types": "./dist-types/_shims/*.d.ts",
+      "default": "./dist/_shims/*.js"
+    },
+    "./uni": {
+      "types": "./dist-types/platform/uni.d.ts",
+      "default": "./dist/platform/uni.js"
+    },
+    "./web": {
+      "types": "./dist-types/platform/web.d.ts",
+      "default": "./dist/platform/web.js"
+    },
+    ".": {
+      "types": "./dist-types/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "dist-types",
+    "polyfills",
+    "shims"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "directory": "package",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "watch": "tsc --build --watch",
+    "format": "prettier src samples --write --log-level warn",
+    "clean:bundle": "rimraf dist dist-types package",
+    "prepublishOnly": "pnpm clean:bundle && pnpm build && clean-publish"
+  },
+  "peerDependencies": {
+    "@dcloudio/types": ">=3.0.0",
+    "web-streams-polyfill": ">=4.0.0",
+    "text-decoding": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@dcloudio/types": {
+      "optional": true
+    },
+    "web-streams-polyfill": {
+      "optional": true
+    },
+    "text-decoding": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@zhengxs/shared": "workspace:^"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.15",
+    "@zhengxs/tsconfig": "workspace:^",
+    "eventsource-parser": "^3.0.1",
+    "text-decoding": "^1.0.0",
+    "web-streams-polyfill": "^4.1.0"
+  }
+}

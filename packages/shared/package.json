@@ -3,14 +3,23 @@
   "version": "0.1.0",
   "author": "zhengxs2018",
   "license": "MIT",
+  "sideEffects": false,
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist-types/index.d.ts",
+  "files": [
+    "dist",
+    "dist-types"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "directory": "package",
+    "registry": "https://registry.npmjs.org"
+  },
   "scripts": {
-    "build": "vite build",
-    "watch": "vite build --mode development --watch",
-    "clean:bundle": "rimraf dist",
-    "prepublishOnly": "pnpm clean:bundle && pnpm build"
+    "build": "tsc --build",
+    "clean:bundle": "rimraf dist dist-types package",
+    "prepublishOnly": "pnpm clean:bundle && pnpm build && clean-publish"
   },
   "devDependencies": {
     "@zhengxs/tsconfig": "workspace:^"

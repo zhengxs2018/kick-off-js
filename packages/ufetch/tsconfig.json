@@ -5,7 +5,8 @@
     "declarationDir": "dist-types",
     "tsBuildInfoFile": "./node_modules/tsconfig.tsbuildinfo",
     "lib": ["esnext", "dom"],
-    "noEmit": false
+    "types": ["@dcloudio/types", "node"],
+    "noEmit": false,
   },
   "include": ["src"]
 }

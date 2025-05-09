@@ -26,7 +26,9 @@ pnpm-debug.log*
 *.sw?
 
 # build artifacts
-dist
+dist/
+dist-types/
+package/
 .turbo
 
 yarn.lock
