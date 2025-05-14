@@ -85,8 +85,9 @@ export function EventSourceParserStream({ onError, onRetry, onComment } = {}) {
 从 `@zhengxs/ufetch/uni` 中导出请求方法和 `TextDecoderStream` 对象。
 
 ```ts
-import { request } from '@zhengxs/ufetch/uni'
+import '@zhengxs/ufetch/shims/uni' // 必须在最顶部
 import { TextDecoderStream } from '@zhengxs/ufetch/shims'
+import { request } from '@zhengxs/ufetch/uni'
 
 const { data } = await request({
   url: 'https://<your base url>/chat/completions',

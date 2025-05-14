@@ -151,7 +151,9 @@ export function createAxios<
       defaults.headers = {}
     }
 
-    if (typeof value === 'string') {
+    let type = typeof value
+
+    if (type === 'string' || type === 'function') {
       defaults.headers[name] = value
     } else {
       defaults.headers[name] = String(value)

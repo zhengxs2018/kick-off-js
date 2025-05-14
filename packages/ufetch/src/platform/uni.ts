@@ -1,4 +1,3 @@
-import '../_shims/uni.js'
 import { ReadableStream } from '../_shims/registry.js'
 import { AxiosError, createAxios, type Axios } from '../core.js'
 
