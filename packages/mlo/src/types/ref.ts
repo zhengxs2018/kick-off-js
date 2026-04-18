@@ -15,21 +15,6 @@ export type MloUnobservableType =
  */
 export interface MloRef<T extends object = object> extends Omit<MloObject, 'links' | 'labels'> {
   /**
-   * 是否正在被观察
-   */
-  readonly observed: boolean
-
-  /**
-   * 是否已被垃圾回收机制标记为可回收
-   */
-  readonly collected: boolean
-
-  /**
-   * 是否已被垃圾回收机制回收
-   */
-  readonly disposed: boolean
-
-  /**
    * 标签列表
    *
    * 允许用户为对象添加任意标签，以便更好地组织和管理对象

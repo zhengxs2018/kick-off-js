@@ -1,5 +1,4 @@
 import type { MloPluginObject } from '../../types/plugin.js'
-import { inBrowser } from './env.js'
 
 const UnobservableTypes: string[] = [
   'string',
@@ -43,7 +42,7 @@ export function isFunction<T extends Function>(o: unknown): o is T {
 }
 
 export function isElement(o: unknown): o is Element {
-  return inBrowser && o instanceof Element
+  return o instanceof Element
 }
 
 export function noop() {

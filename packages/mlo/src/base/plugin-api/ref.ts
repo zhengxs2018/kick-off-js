@@ -4,20 +4,14 @@ import { readonly, writable, constant, getter } from '../common/descriptors.js'
 import type { MloRef } from '../../types/ref.js'
 import type { MloObject } from '../../types/object.js'
 import { emit } from './event.js'
+import { ObjectSources, ObjectRefs } from './store.js'
+import { track, untrack } from './tracker.js'
 import {
-  ObjectSources,
-  ObjectRefs,
-  ObjectLinks,
-  ObjectRegistry,
-} from './store.js'
-
-/**
- * 对象引用索引计数器
- *
- * @internal
- * @deprecated 内部API，请勿在外部使用
- */
-let idxCounter = 0
+  MLO_OBJECT_BEFORE_OBSERVE_EVENT,
+  MLO_OBJECT_COLLECTED_EVENT,
+  MLO_OBJECT_UNOBSERVED_EVENT,
+  MLO_OBJECT_OBSERVED_EVENT,
+} from './consts.js'
 
 /**
  * 是否对象引用
@@ -26,6 +20,14 @@ let idxCounter = 0
  * @deprecated 内部API，请勿在外部使用
  */
 const RefSymbolKey = Symbol('MloRef')
+
+/**
+ * 对象引用索引计数器
+ *
+ * @internal
+ * @deprecated 内部API，请勿在外部使用
+ */
+let idxCounter = 0
 
 /**
  * 判断是否为对象引用
@@ -85,13 +87,14 @@ export function unref<T extends object>(ref: MloRef<T>): MloRef<T> | undefined {
 function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
   const id = idxCounter++
 
-  const target = new WeakRef(source)
-
   const state = {
+    collectedAt: null as number | null,
     observed: true,
     collected: false,
     disposed: false,
   }
+
+  const target = new WeakRef(source)
 
   const self: MloRef<T> = Object.create(null, {
     ...ResolveObjectInfo(source),
@@ -99,27 +102,28 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
     observed: getter(() => state.observed),
     detached: getter(checkAlive),
     collected: getter(() => state.collected),
+    collectedAt: getter(() => state.collectedAt),
     disposed: getter(() => state.disposed),
     labels: readonly(new Set()),
-    links: getter(() => ObjectLinks.get(self) || new Set()),
-    linkTo: constant((target: MloRef): MloRef<T> => {
-      if (state.disposed || target === self) return self
+    links: readonly(new Set()),
+    linkTo: constant(function link(target: MloRef): MloRef<T> {
+      if (self.disposed || target === self) return self
 
       if (isRef(self)) {
-        LinkTo(self, target)
-        LinkTo(target, self)
+        self.links.add(target.id)
+        target.links.add(self.id)
       } else {
         console.trace(`Attempting to link an Non-ref object:`, target)
       }
 
       return self
     }),
-    unlink: constant((target: MloRef): MloRef<T> => {
-      if (state.disposed || target === self) return self
+    unlink: constant(function unlink(target: MloRef): MloRef<T> {
+      if (self.disposed || target === self) return self
 
       if (isRef(target)) {
-        Unlink(self, target)
-        Unlink(target, self)
+        self.links.delete(target.id)
+        target.links.delete(self.id)
       } else {
         console.trace(`Attempting to unlink an Non-ref object:`, target)
       }
@@ -138,6 +142,7 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
       const source = target.deref()
       return source ? undefined : void dispose()
     }),
+    createdAt: readonly(Date.now()),
     toString: constant(toString),
     toJSON: constant(toJSON),
     dispose: constant(dispose),
@@ -148,16 +153,18 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
   })
 
   // Note: 允许外部在观察前取消观察，以避免不必要的性能开销
-  if (emit('object:observe', { detail: self }) === false) {
+  if (emit(MLO_OBJECT_BEFORE_OBSERVE_EVENT, { detail: self }) === false) {
     return self
   }
 
+  track(source, self)
+
   ObjectRefs.set(id, self)
   ObjectSources.set(source, self)
-  ObjectRegistry.register(source, id, self)
+
   state.observed = true
 
-  emit('object:observed', { detail: self })
+  emit(MLO_OBJECT_OBSERVED_EVENT, { detail: self })
 
   return self
 
@@ -173,7 +180,12 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
       category: self.category,
       labels: Array.from(self.labels),
       links: Array.from(self.links),
+      observed: self.observed,
       detached: self.detached,
+      disposed: self.disposed,
+      createdAt: self.createdAt,
+      collected: self.collected,
+      collectedAt: self.collectedAt,
     }
   }
 
@@ -183,22 +195,22 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
       return self
     }
 
-    state.observed = false
-    state.disposed = true
-
-    ObjectRegistry.unregister(self)
+    untrack(self)
 
     ObjectRefs.delete(id)
-    ObjectLinks.delete(self)
 
     const source = target.deref()
 
+    state.observed = false
+    state.disposed = true
+
     if (source) {
       ObjectSources.delete(source)
-      emit('object:unobserved', { detail: self })
+      emit(MLO_OBJECT_UNOBSERVED_EVENT, { detail: self })
     } else {
       state.collected = true
-      emit('object:collected', { detail: self })
+      state.collectedAt = Date.now()
+      emit(MLO_OBJECT_COLLECTED_EVENT, { detail: self })
     }
 
     return self
@@ -206,7 +218,12 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
 
   function checkAlive() {
     const source = target.deref()
-    return isElement(source) ? source.isConnected : false
+
+    if (inBrowser) {
+      return isElement(source) ? source.isConnected : true
+    }
+
+    return true
   }
 }
 
@@ -253,62 +270,4 @@ function ResolveObjectInfo(source: object) {
     ),
     category: writable('object'),
   }
-}
-
-/**
- * 建立链接
- *
- * @internal
- * @deprecated 内部API，请勿在外部使用
- * @param source - 源对象引用
- * @param target - 目标对象引用
- */
-function LinkTo(source: MloRef, target: MloRef) {
-  const links = GetOrCreateLinks(source, true)
-  if (links) links.add(target.id)
-}
-
-/**
- * 解除链接
- *
- *
- * @internal
- * @deprecated 内部API，请勿在外部使用
- * @param source - 源对象引用
- * @param target - 目标对象引用
- */
-function Unlink(source: MloRef, target: MloRef) {
-  const links = GetOrCreateLinks(source)
-
-  if (links && links.delete(target.id) && links.size === 0) {
-    ObjectLinks.delete(source)
-  }
-}
-
-/**
- * 获取或创建链接集合
- *
- * @internal
- * @deprecated 内部API，请勿在外部使用
- * @param ref - 对象引用
- * @param Create - 是否创建链接集合（如果不存在）
- * @returns 链接集合或 undefined
- */
-function GetOrCreateLinks(ref: MloRef): Set<number> | undefined
-function GetOrCreateLinks(ref: MloRef, Create: true): Set<number>
-function GetOrCreateLinks(
-  ref: MloRef,
-  Create?: boolean
-): Set<number> | undefined {
-  const links = ObjectLinks.get(ref)
-
-  if (links) return links
-
-  if (!Create) return undefined
-
-  const newLinks = new Set<number>()
-
-  ObjectLinks.set(ref, newLinks)
-
-  return newLinks
 }

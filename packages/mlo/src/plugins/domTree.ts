@@ -6,6 +6,12 @@ import {
   NativeMutationObserver,
   scanDOMTree,
 } from '../base/index.js'
+import {
+  MLO_ELEMENT_ADDED_EVENT,
+  MLO_ELEMENT_REMOVED_EVENT,
+} from '../base/plugin-api/consts.js'
+import type { Matcher, Rule } from '../types/matcher.js'
+import { createMatcher } from '../base/plugin-api/matcher.js'
 
 export type DomTreeOptions = {
   /**
@@ -29,7 +35,12 @@ export type DomTreeOptions = {
    *
    * 注意：启用此功能将导致CPU使用量显著增加。
    */
-  monitor: boolean
+  monitor?: boolean
+
+  /**
+   * 监视规则配置项，允许用户自定义监视的行为和范围。
+   */
+  rules?: Rule[]
 }
 
 export function domTree(options?: DomTreeOptions): MloPluginObject {
@@ -51,21 +62,38 @@ export function domTree(options?: DomTreeOptions): MloPluginObject {
         return
       }
 
+      const matcher = createMatcher<HTMLElement>(
+        options?.rules || [],
+        (node, check) => {
+          if (check(node.id) || check(node.tagName.toLowerCase())) return true
+
+          const classList = node.classList
+
+          for (let i = 0, len = classList.length; i < len; i++) {
+            if (check(classList[i])) return true
+          }
+
+          return false
+        }
+      )
+
+      subscriptions.push(matcher)
+
       if (options?.scan) {
-        subscriptions.push(ScanDOMTree(target))
+        subscriptions.push(ScanDOMTree(target, matcher))
       }
 
       if (options?.monitor) {
-        subscriptions.push(MonitorDOMTree(target))
+        subscriptions.push(MonitorDOMTree(target, matcher))
       }
     },
   }
 }
 
-function ScanDOMTree(element: Element) {
+function ScanDOMTree(element: Element, matcher: Matcher<Element>) {
   let scanRAFId: number | undefined
 
-  scanRAFId = requestAnimationFrame(() => scanDOMTree(element))
+  scanRAFId = requestAnimationFrame(() => scanDOMTree(element, matcher))
 
   return () => {
     if (scanRAFId) {
@@ -75,27 +103,23 @@ function ScanDOMTree(element: Element) {
   }
 }
 
-function MonitorDOMTree(element: Element) {
+function MonitorDOMTree(element: Element, matcher: Matcher<HTMLElement>) {
   let obRAFId: number | undefined
+  let isProcessing = false
 
-  let observer = new NativeMutationObserver((records) => {
-    if (obRAFId) cancelAnimationFrame(obRAFId)
+  let observer: MutationObserver | undefined = new NativeMutationObserver(
+    (records) => {
+      if (isProcessing) return
 
-    obRAFId = requestAnimationFrame(() => {
-      for (const { addedNodes, removedNodes } of records) {
-        for (let index = 0; index < addedNodes.length; index++) {
-          const node = addedNodes[index]
+      isProcessing = true
 
-          emit('element:added', { detail: node })
-        }
-
-        for (let index = 0; index < removedNodes.length; index++) {
-          const node = removedNodes[index]
-          emit('element:removed', { detail: node })
-        }
-      }
-    })
-  })
+      obRAFId = requestAnimationFrame(() => {
+        processRecords(records)
+        isProcessing = false
+        obRAFId = undefined
+      })
+    }
+  )
 
   observer.observe(element, { subtree: true, childList: true })
 
@@ -108,7 +132,37 @@ function MonitorDOMTree(element: Element) {
     if (observer) {
       observer.disconnect()
       observer.takeRecords()
-      ;(observer as unknown) = undefined
+      observer = undefined
+    }
+  }
+
+  function processRecords(records: MutationRecord[]) {
+    let idx: number
+    let len: number
+    let node: Node
+
+    for (const { addedNodes, removedNodes } of records) {
+      for (idx = 0, len = addedNodes.length; idx < len; idx++) {
+        node = addedNodes[idx]
+
+        if (
+          node.nodeType === Node.ELEMENT_NODE &&
+          matcher.match(node as HTMLElement).ok
+        ) {
+          emit(MLO_ELEMENT_ADDED_EVENT, { detail: node })
+        }
+      }
+
+      for (idx = 0, len = removedNodes.length; idx < len; idx++) {
+        node = removedNodes[idx]
+
+        if (
+          node.nodeType === Node.ELEMENT_NODE &&
+          matcher.match(node as HTMLElement).ok
+        ) {
+          emit(MLO_ELEMENT_REMOVED_EVENT, { detail: node })
+        }
+      }
     }
   }
 }

@@ -1,10 +1,5 @@
 import type { MloPluginObject, MloSetupContext } from '../types/index.js'
-import {
-  isElement,
-  isObservable,
-  NativeAddEventListener,
-  ref,
-} from '../base/index.js'
+import { isObservable, NativeAddEventListener, ref } from '../base/index.js'
 
 export function eventTarget(): MloPluginObject {
   return {

@@ -59,7 +59,32 @@ export interface MloObject {
   links: number[]
 
   /**
+   * 是否正在被观察
+   */
+  readonly observed: boolean
+
+  /**
+   * 是否已被垃圾回收机制回收
+   */
+  readonly disposed: boolean
+
+  /**
    * 是否游离
    */
-  detached: boolean
+  readonly detached: boolean
+
+  /**
+   * 创建时间戳
+   */
+  readonly createdAt: number
+
+  /**
+   * 是否已被垃圾回收机制标记为可回收
+   */
+  readonly collected: boolean
+
+  /**
+   * 回收时间戳
+   */
+  readonly collectedAt?: number | null
 }

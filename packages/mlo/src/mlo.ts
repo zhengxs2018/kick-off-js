@@ -1,9 +1,5 @@
 import { ref } from './base/plugin-api/ref.js'
-import {
-  ObjectSources,
-  ObjectRefs,
-  ObjectRegistry,
-} from './base/plugin-api/store.js'
+import { ObjectSources, ObjectRefs } from './base/plugin-api/store.js'
 import { createEvent, disposeAll } from './base/plugin-api/event.js'
 import { isPluginObject, noop } from './base/common/utils.js'
 import type { MloRef } from './types/ref.js'
@@ -14,9 +10,20 @@ import type {
   MloPluginObject,
 } from './types/plugin.js'
 import type { DisposeLike } from './types/event.js'
-import { constant, getter, readonly } from './base/index.js'
+import {
+  constant,
+  getter,
+  MLO_ELEMENT_ADDED_EVENT,
+  MLO_ELEMENT_REMOVED_EVENT,
+  MLO_OBJECT_BEFORE_OBSERVE_EVENT,
+  MLO_OBJECT_UNOBSERVED_EVENT,
+  MLO_OBJECT_OBSERVED_EVENT,
+  readonly,
+  MLO_OBJECT_COLLECTED_EVENT,
+} from './base/index.js'
 import type { MloInstance } from './types/mlo.js'
 import type { MloData, MloStats } from './types/snapshot.js'
+import { untrack } from './base/plugin-api/tracker.js'
 
 const state = {
   disposed: false,
@@ -33,14 +40,13 @@ const subscriptions: Array<DisposeLike | (() => void)> = [
 ]
 
 export const mlo: MloInstance = Object.create(null, {
-  disposed: getter(() => state.disposed),
   events: readonly({
-    onElementAdded: createEvent<Element>('element:added'),
-    onElementRemoved: createEvent<Element>('element:removed'),
-    onObjectObserve: createEvent<MloRef>('object:observe'),
-    onObjectObserved: createEvent<MloRef>('object:observed'),
-    onObjectUnobserved: createEvent<MloRef>('object:unobserved'),
-    onObjectCollected: createEvent<MloRef>('object:collected'),
+    onElementAdded: createEvent<Element>(MLO_ELEMENT_ADDED_EVENT),
+    onElementRemoved: createEvent<Element>(MLO_ELEMENT_REMOVED_EVENT),
+    onObjectObserve: createEvent<MloRef>(MLO_OBJECT_BEFORE_OBSERVE_EVENT),
+    onObjectObserved: createEvent<MloRef>(MLO_OBJECT_OBSERVED_EVENT),
+    onObjectUnobserved: createEvent<MloRef>(MLO_OBJECT_UNOBSERVED_EVENT),
+    onObjectCollected: createEvent<MloRef>(MLO_OBJECT_COLLECTED_EVENT),
   }),
   use: constant(use),
   get: constant(get),
@@ -53,6 +59,7 @@ export const mlo: MloInstance = Object.create(null, {
   toJSON: constant(toJSON),
   takeRecords: constant(takeRecords),
   dispose: constant(dispose),
+  disposed: getter(() => state.disposed),
   [Symbol.toPrimitive]: constant(toString),
   [Symbol.toStringTag]: constant('MLO'),
   [Symbol.dispose]: constant(dispose),
@@ -133,7 +140,7 @@ function takeRecords(predicate: (ref: MloRef) => unknown = noop) {
   for (const ref of values(predicate)) {
     records.push(ref)
 
-    ObjectRegistry.unregister(ref)
+    untrack(ref)
     ObjectRefs.delete(ref.id)
 
     const source = ref.deref()!
