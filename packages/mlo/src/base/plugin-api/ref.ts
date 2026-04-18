@@ -1,4 +1,4 @@
-import { isElement, isObservable } from '../common/utils.js'
+import { analyzePrototype, isObservable } from '../common/utils.js'
 import { inBrowser } from '../common/env.js'
 import { readonly, writable, constant, getter } from '../common/descriptors.js'
 import type { MloRef } from '../../types/ref.js'
@@ -88,19 +88,18 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
   const id = idxCounter++
 
   const state = {
-    collectedAt: null as number | null,
     observed: true,
     collected: false,
+    collectedAt: null as number | null,
     disposed: false,
   }
 
   const target = new WeakRef(source)
 
   const self: MloRef<T> = Object.create(null, {
-    ...ResolveObjectInfo(source),
+    ...ResolveObjectInfo(source, target),
     id: readonly(id),
     observed: getter(() => state.observed),
-    detached: getter(checkAlive),
     collected: getter(() => state.collected),
     collectedAt: getter(() => state.collectedAt),
     disposed: getter(() => state.disposed),
@@ -180,6 +179,7 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
       category: self.category,
       labels: Array.from(self.labels),
       links: Array.from(self.links),
+      meta: self.meta,
       observed: self.observed,
       detached: self.detached,
       disposed: self.disposed,
@@ -215,16 +215,6 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
 
     return self
   }
-
-  function checkAlive() {
-    const source = target.deref()
-
-    if (inBrowser) {
-      return isElement(source) ? source.isConnected : true
-    }
-
-    return true
-  }
 }
 
 /**
@@ -233,22 +223,32 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
  * @internal
  * @deprecated 内部API，请勿在外部使用
  * @param source - 源对象
+ * @param ref - 对象的弱引用
  * @returns 包含对象名称、类型和类别的对象信息
  */
-function ResolveObjectInfo(source: object) {
+function ResolveObjectInfo(source: object, ref: WeakRef<object>) {
   if (Array.isArray(source)) {
     return {
       name: writable('unknown'),
       type: writable('Array'),
       category: writable('object'),
+      meta: readonly({
+        className: 'Array',
+        extends: [],
+      }),
+      detached: writable(false),
     }
   }
-
-  if (source instanceof Function) {
+  if (typeof source === 'function') {
     return {
       name: writable((source as Function).name || 'anonymous'),
       type: writable('Function'),
       category: writable('function'),
+      meta: readonly({
+        className: 'Function',
+        extends: [],
+      }),
+      detached: writable(false),
     }
   }
 
@@ -257,17 +257,21 @@ function ResolveObjectInfo(source: object) {
       name: writable(source.tagName.toLowerCase()),
       type: writable(source.constructor.name),
       category: writable('element'),
+      meta: readonly({
+        className: source.constructor.name,
+        extends: ['Element'],
+      }),
+      detached: writable(() => (ref.deref() as Element)?.isConnected ?? false),
     }
   }
 
-  const { constructor } = source
+  const [className, prototype] = analyzePrototype(source)
 
   return {
     name: writable('unknown'),
-    type: writable(
-      // 使用 Object.create() 创建的对象没有 constructor
-      constructor ? constructor.name : 'Object'
-    ),
+    type: writable(className),
     category: writable('object'),
+    meta: readonly({ className, extends: prototype }),
+    detached: writable(false),
   }
 }

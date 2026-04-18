@@ -15,7 +15,9 @@ let objectRef = mlo.observe(obj)
 
 console.log('Object reference created: %s', objectRef)
 
-let event: EventTarget | null = new EventTarget()
+class Foo extends EventTarget{}
+
+let event: EventTarget | null = new Foo()
 
 event.addEventListener('test', function () {
   console.log('Event "test" triggered')

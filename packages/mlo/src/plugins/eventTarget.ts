@@ -23,11 +23,14 @@ export function eventTarget(): MloPluginObject {
             return NativeAddEventListener.call(this, type, listener, options)
           }
 
-          eventRef.labels.add(type)
-          eventRef.labels.add('eventListener')
+          eventRef.name = type
+          eventRef.labels.add('listener')
 
           if (isObservable(this)) {
-            eventRef.linkTo(ref(this))
+            const targetRef = ref(this)
+
+            eventRef.labels.add(targetRef.type)
+            eventRef.linkTo(targetRef)
           }
 
           return NativeAddEventListener.call(this, type, listener, options)

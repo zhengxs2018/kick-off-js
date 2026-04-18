@@ -45,18 +45,23 @@ export interface MloObject {
   category: (string & {}) | MloObjectCategory
 
   /**
+   * 元信息，包含对象的原型链等信息，供用户参考
+   */
+  readonly meta: Record<PropertyKey, any>
+
+  /**
    * 标签列表
    *
    * 允许用户为对象添加任意标签，以便更好地组织和管理对象
    * 标签可以是任何字符串，用户可以根据需要定义和使用标签
    * 例如，可以使用标签来标记对象的用途、所属模块、生命周期阶段等
    */
-  labels: string[]
+  readonly labels: string[]
 
   /**
    * 与该对象相关的链接列表，描述了该对象与其他对象之间的关系。
    */
-  links: number[]
+  readonly links: number[]
 
   /**
    * 是否正在被观察

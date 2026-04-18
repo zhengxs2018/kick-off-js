@@ -1,4 +1,8 @@
 import type { MloPluginObject } from '../../types/plugin.js'
+import { inBrowser } from './env.js'
+
+const OBJ_PROTO = Object.prototype
+const ELEM_PROTO = inBrowser ? Element.prototype : null
 
 const UnobservableTypes: string[] = [
   'string',
@@ -62,4 +66,28 @@ export function querySelector(
   }
 
   return null
+}
+
+export function analyzePrototype(o: object) {
+  const chain: string[] = []
+
+  let current: object | null = Object.getPrototypeOf(o)
+
+  while (current !== null && current !== OBJ_PROTO) {
+    const ctor = current.constructor
+    const name = ctor?.name ?? 'Unknown'
+
+    if (name === 'Object') break
+
+    chain.push(name)
+
+    if ((inBrowser && isElement(o)) || current === ELEM_PROTO) {
+      chain.push('Element')
+      break
+    }
+
+    current = Object.getPrototypeOf(current)
+  }
+
+  return [chain[0] || 'Object', chain.slice(1)] as const
 }
