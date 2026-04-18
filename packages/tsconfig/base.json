@@ -3,8 +3,6 @@
   "display": "Base",
   "compilerOptions": {
     "allowJs": true,
-    "noEmit": true,
-    "downlevelIteration": true,
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -17,8 +15,8 @@
     "noImplicitReturns": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "target": "ESNext",
-    "lib": ["ESNext"],
+    "target": "ES2024",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "types": []
   }
 }

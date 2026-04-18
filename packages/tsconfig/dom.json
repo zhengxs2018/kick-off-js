@@ -7,7 +7,6 @@
     "jsxImportSource": "vue",
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "types": []
   }
 }

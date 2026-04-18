@@ -1,5 +1,6 @@
 {
   "withoutPublish": true,
+  "packageManager": "pnpm",
   "tempDir": "package",
   "fields": [
     "engines"

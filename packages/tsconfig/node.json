@@ -3,13 +3,11 @@
   "display": "Library",
   "extends": "./base.json",
   "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/tsconfig.tsbuildinfo",
     "declaration": true,
     "verbatimModuleSyntax": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "types": [
-      "node"
-    ],
-    "noEmit": true
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "types": ["node"]
   }
 }
