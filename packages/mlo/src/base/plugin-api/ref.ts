@@ -9,7 +9,7 @@ import { track, untrack } from './tracker.js'
 import {
   MLO_OBJECT_BEFORE_OBSERVE_EVENT,
   MLO_OBJECT_COLLECTED_EVENT,
-  MLO_OBJECT_UNOBSERVED_EVENT,
+  MLO_OBJECT_DISPOSED_EVENT,
   MLO_OBJECT_OBSERVED_EVENT,
 } from './consts.js'
 
@@ -206,7 +206,7 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
 
     if (source) {
       ObjectSources.delete(source)
-      emit(MLO_OBJECT_UNOBSERVED_EVENT, { detail: self })
+      emit(MLO_OBJECT_DISPOSED_EVENT, { detail: self })
     } else {
       state.collected = true
       state.collectedAt = Date.now()
