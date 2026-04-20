@@ -1,6 +1,8 @@
 import type { DisposeLike } from './event.js'
+import type { MloEvents } from './mlo.js'
 
 export type MloSetupContext = {
+  events: MloEvents
   subscriptions: Array<DisposeLike | (() => void)>
 }
 

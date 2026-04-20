@@ -18,7 +18,30 @@ export type MloObjectType =
   | 'Object'
   | 'Array'
   | 'Component'
+  | 'Element'
   | 'Unknown'
+
+export interface MloFrameworkInfo {
+  name: string
+  version: string
+  majorVersion: number
+}
+
+export interface MloObjectStack {
+  id?: number
+  type: string
+  stack: string | undefined
+  at: number
+}
+
+export interface MloObjectMeta {
+  /**
+   * 框架信息
+   */
+  framework?: MloFrameworkInfo
+
+  [key: PropertyKey]: any
+}
 
 /**
  * 对象引用接口
@@ -47,7 +70,7 @@ export interface MloObject {
   /**
    * 元信息，包含对象的原型链等信息，供用户参考
    */
-  readonly meta: Record<PropertyKey, any>
+  readonly meta: MloObjectMeta
 
   /**
    * 标签列表
@@ -62,6 +85,11 @@ export interface MloObject {
    * 与该对象相关的链接列表，描述了该对象与其他对象之间的关系。
    */
   readonly links: number[]
+
+  /**
+   * 对象的堆栈信息列表
+   */
+  readonly stacks: MloObjectStack[]
 
   /**
    * 是否正在被观察

@@ -1,0 +1,11 @@
+{
+  "extends": "@zhengxs/tsconfig/dom",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/tsconfig.tsbuildinfo",
+    "jsx": "react",
+    "jsxFactory": "React.createElement",
+    "types": ["node", "vite/client", "react", "react-dom"],
+    "noEmit": true
+  },
+  "include": ["src"]
+}

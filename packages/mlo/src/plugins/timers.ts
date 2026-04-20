@@ -6,6 +6,7 @@ import {
   NativeSetTimeout,
   isNil,
   inBrowser,
+  captureStack,
 } from '../base/index.js'
 import type { MloPluginObject } from '../types/plugin.js'
 
@@ -61,7 +62,21 @@ function MonitorTimeout({ enable, time }: Required<TimerOptions>) {
     timeout: number,
     ...args: any[]
   ): number | NodeJS.Timeout {
-    if (isFunction(handler) && timeout > time) ref(handler)
+    if (isFunction(handler) && timeout > time) {
+      const timeoutRef = ref(handler)
+
+      if (timeoutRef) {
+        timeoutRef.name = 'setTimeout'
+        timeoutRef.labels.add('timer')
+        timeoutRef.labels.add('timeout')
+
+        timeoutRef.stacks.push({
+          type: `setTimeout(${timeout})`,
+          stack: captureStack(handler, 1)!,
+          at: Date.now(),
+        })
+      }
+    }
 
     // @ts-expect-error ignore type error of setTimeout
     return NativeSetTimeout.call(this, handler, timeout, ...args)
@@ -81,7 +96,20 @@ function MonitorInterval({ enable, time }: Required<TimerOptions>) {
     timeout: number,
     ...args: any[]
   ): number | NodeJS.Timeout {
-    if (isFunction(handler) && timeout > time) ref(handler)
+    if (isFunction(handler) && timeout > time) {
+      const intervalRef = ref(handler)
+
+      if (intervalRef) {
+        intervalRef.name = 'setInterval'
+        intervalRef.labels.add('timer')
+        intervalRef.labels.add('interval')
+        intervalRef.stacks.push({
+          type: `setInterval(${timeout})`,
+          stack: captureStack(handler, 1)!,
+          at: Date.now(),
+        })
+      }
+    }
 
     // @ts-expect-error ignore type error of setInterval
     return NativeSetInterval.call(this, handler, timeout, ...args)

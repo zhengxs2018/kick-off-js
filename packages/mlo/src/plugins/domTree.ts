@@ -130,8 +130,8 @@ function MonitorDOMTree(element: Element, matcher: Matcher<HTMLElement>) {
     }
 
     if (observer) {
-      observer.disconnect()
       observer.takeRecords()
+      observer.disconnect()
       observer = undefined
     }
   }

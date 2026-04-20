@@ -18,6 +18,7 @@
     "types": "./dist-types/index.d.ts"
   },
   "scripts": {
+    "serve": "cd samples/ui && pnpm dev",
     "build": "tsc --build",
     "watch": "tsc --build --watch",
     "format": "prettier src --write --log-level warn --ignore-path ../../.prettierignore",

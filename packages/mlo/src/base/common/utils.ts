@@ -74,6 +74,14 @@ export function analyzePrototype(o: object) {
   let current: object | null = Object.getPrototypeOf(o)
 
   while (current !== null && current !== OBJ_PROTO) {
+    // Note: 如果是覆盖了原始类型，通过 __mlo_class__ 来标识原始类型的类名
+    const className = (current as any).__mlo_class__
+
+    if (className) {
+      chain.unshift(className)
+      break
+    }
+
     const ctor = current.constructor
     const name = ctor?.name ?? 'Unknown'
 

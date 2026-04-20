@@ -1,5 +1,10 @@
 import type { MloPluginObject, MloSetupContext } from '../types/index.js'
-import { isObservable, NativeAddEventListener, ref } from '../base/index.js'
+import {
+  isObservable,
+  NativeAddEventListener,
+  ref,
+  captureStack,
+} from '../base/index.js'
 
 export function eventTarget(): MloPluginObject {
   return {
@@ -14,6 +19,10 @@ export function eventTarget(): MloPluginObject {
 
       const wrappedAdd: typeof EventTarget.prototype.addEventListener =
         function (this: EventTarget, type, listener, options) {
+          if (typeof listener !== 'function') {
+            return NativeAddEventListener.call(this, type, listener, options)
+          }
+
           const eventRef = ref(listener as EventListener)
 
           // Note:
@@ -24,13 +33,27 @@ export function eventTarget(): MloPluginObject {
           }
 
           eventRef.name = type
-          eventRef.labels.add('listener')
 
           if (isObservable(this)) {
             const targetRef = ref(this)
 
             eventRef.labels.add(targetRef.type)
+
+            eventRef.stacks.push({
+              id: targetRef.id,
+              type: `${targetRef.type}.addEventListener(${type})`,
+              stack: captureStack(listener, 2)!,
+              at: Date.now(),
+            })
+
             eventRef.linkTo(targetRef)
+          } else {
+            eventRef.labels.add('globalThis')
+            eventRef.stacks.push({
+              type: `globalThis.addEventListener(${type})`,
+              stack: captureStack(listener, 2)!,
+              at: Date.now(),
+            })
           }
 
           return NativeAddEventListener.call(this, type, listener, options)

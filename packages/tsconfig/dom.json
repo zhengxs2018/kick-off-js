@@ -4,9 +4,9 @@
   "extends": "./base.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "jsxImportSource": "vue",
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "types": []
+    "types": [],
+    "noEmit": true
   }
 }

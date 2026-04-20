@@ -7,6 +7,7 @@ export interface MloData {
 }
 
 export type MloStatsItem = {
+  type: string
   total: number
   detached: number
   details: MloStatsSubItem[]

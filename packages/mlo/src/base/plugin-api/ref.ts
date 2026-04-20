@@ -99,12 +99,14 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
   const self: MloRef<T> = Object.create(null, {
     ...ResolveObjectInfo(source, target),
     id: readonly(id),
+    labels: constant(new Set()),
+    links: constant(new Set()),
+    stacks: constant([]),
     observed: getter(() => state.observed),
     collected: getter(() => state.collected),
     collectedAt: getter(() => state.collectedAt),
+    createdAt: readonly(Date.now()),
     disposed: getter(() => state.disposed),
-    labels: readonly(new Set()),
-    links: readonly(new Set()),
     linkTo: constant(function link(target: MloRef): MloRef<T> {
       if (self.disposed || target === self) return self
 
@@ -141,7 +143,6 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
       const source = target.deref()
       return source ? undefined : void dispose()
     }),
-    createdAt: readonly(Date.now()),
     toString: constant(toString),
     toJSON: constant(toJSON),
     dispose: constant(dispose),
@@ -179,6 +180,7 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
       category: self.category,
       labels: Array.from(self.labels),
       links: Array.from(self.links),
+      stacks: self.stacks,
       meta: self.meta,
       observed: self.observed,
       detached: self.detached,
@@ -191,7 +193,7 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
 
   function dispose(): MloRef<T> {
     if (state.disposed) {
-      console.warn(`Attempting to disconnect an already disposed ref:`, self)
+      console.debug(`Attempting to disconnect an already disposed ref:`, self)
       return self
     }
 

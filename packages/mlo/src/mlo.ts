@@ -13,15 +13,17 @@ import type { DisposeLike } from './types/event.js'
 import {
   constant,
   getter,
-  MLO_ELEMENT_ADDED_EVENT,
-  MLO_ELEMENT_REMOVED_EVENT,
   MLO_OBJECT_BEFORE_OBSERVE_EVENT,
   MLO_OBJECT_DISPOSED_EVENT,
   MLO_OBJECT_OBSERVED_EVENT,
+  MLO_ELEMENT_ADDED_EVENT,
+  MLO_ELEMENT_REMOVED_EVENT,
+  MLO_COMPONENT_MOUNTED_EVENT,
+  MLO_COMPONENT_UNMOUNTED_EVENT,
   readonly,
   MLO_OBJECT_COLLECTED_EVENT,
 } from './base/index.js'
-import type { MloInstance } from './types/mlo.js'
+import type { MloEvents, MloInstance } from './types/mlo.js'
 import type { MloData, MloStats } from './types/snapshot.js'
 import { untrack } from './base/plugin-api/tracker.js'
 
@@ -30,6 +32,17 @@ const state = {
 }
 
 const plugins = new Set<MloPlugin>()
+
+const events: MloEvents = {
+  onObjectObserve: createEvent<MloRef>(MLO_OBJECT_BEFORE_OBSERVE_EVENT),
+  onObjectObserved: createEvent<MloRef>(MLO_OBJECT_OBSERVED_EVENT),
+  onObjectUnobserved: createEvent<MloRef>(MLO_OBJECT_DISPOSED_EVENT),
+  onObjectCollected: createEvent<MloRef>(MLO_OBJECT_COLLECTED_EVENT),
+  onElementAdded: createEvent<Element>(MLO_ELEMENT_ADDED_EVENT),
+  onElementRemoved: createEvent<Element>(MLO_ELEMENT_REMOVED_EVENT),
+  onComponentMounted: createEvent<unknown>(MLO_COMPONENT_MOUNTED_EVENT),
+  onComponentUnmounted: createEvent<unknown>(MLO_COMPONENT_UNMOUNTED_EVENT),
+}
 
 const subscriptions: Array<DisposeLike | (() => void)> = [
   () => {
@@ -40,14 +53,7 @@ const subscriptions: Array<DisposeLike | (() => void)> = [
 ]
 
 export const mlo: MloInstance = Object.create(null, {
-  events: readonly({
-    onElementAdded: createEvent<Element>(MLO_ELEMENT_ADDED_EVENT),
-    onElementRemoved: createEvent<Element>(MLO_ELEMENT_REMOVED_EVENT),
-    onObjectObserve: createEvent<MloRef>(MLO_OBJECT_BEFORE_OBSERVE_EVENT),
-    onObjectObserved: createEvent<MloRef>(MLO_OBJECT_OBSERVED_EVENT),
-    onObjectUnobserved: createEvent<MloRef>(MLO_OBJECT_DISPOSED_EVENT),
-    onObjectCollected: createEvent<MloRef>(MLO_OBJECT_COLLECTED_EVENT),
-  }),
+  events: readonly(events),
   use: constant(use),
   get: constant(get),
   key: constant(key),
@@ -82,7 +88,7 @@ function use<P extends MloPlugin>(
   }
 
   if (isPluginObject(plugin)) {
-    ;(plugin as unknown as MloPluginObject).setup({ subscriptions })
+    ;(plugin as unknown as MloPluginObject).setup({ events, subscriptions })
   }
 }
 
@@ -175,7 +181,7 @@ function toJSON(): MloData {
   const items: MloObject[] = []
   const stats: MloStats = {}
 
-  for (const ref of mlo.values()) {
+  for (const ref of values()) {
     const source = ref.deref()
     if (!source) continue
 
@@ -210,12 +216,12 @@ function toJSON(): MloData {
 
   return { timestamp: Date.now(), items, stats }
 
-  function getStatsItem(category: string) {
-    let item = stats[category]
+  function getStatsItem(type: string) {
+    let item = stats[type]
 
     if (!item) {
-      item = { total: 0, detached: 0, details: [] }
-      stats[category] = item
+      item = { type, total: 0, detached: 0, details: [] }
+      stats[type] = item
     }
 
     return item
