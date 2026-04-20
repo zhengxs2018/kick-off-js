@@ -15,14 +15,14 @@ export function scanDOMTree(element: Element, matcher: Matcher<HTMLElement>) {
   let node = walker.currentNode as HTMLElement
 
   if (document.body.contains(element) && matcher.match(node).ok) {
-    emit(MLO_ELEMENT_ADDED_EVENT, { detail: node })
+    emit(MLO_ELEMENT_ADDED_EVENT, node)
   }
 
   while (walker.nextNode()) {
     node = walker.currentNode as HTMLElement
 
     if (matcher.match(node).ok) {
-      emit(MLO_ELEMENT_ADDED_EVENT, { detail: node })
+      emit(MLO_ELEMENT_ADDED_EVENT, node)
     }
   }
 }

@@ -5,6 +5,7 @@ import {
   inBrowser,
   NativeMutationObserver,
   scanDOMTree,
+  ref,
 } from '../base/index.js'
 import {
   MLO_ELEMENT_ADDED_EVENT,
@@ -46,7 +47,7 @@ export type DomTreeOptions = {
 export function domTree(options?: DomTreeOptions): MloPluginObject {
   return {
     name: 'domTree',
-    setup({ subscriptions }: MloSetupContext) {
+    setup({ events, subscriptions }: MloSetupContext) {
       if (!inBrowser) {
         console.debug(
           '[mlo] domTree plugin is designed to work in browser environment, skipping setup.'
@@ -80,7 +81,10 @@ export function domTree(options?: DomTreeOptions): MloPluginObject {
         }
       )
 
-      subscriptions.push(matcher)
+      subscriptions.push(
+        matcher,
+        events.onElementAdded((elem) => ref(elem)),
+      )
 
       if (options?.scan) {
         subscriptions.push(ScanDOMTree(target, matcher))
@@ -152,7 +156,7 @@ function MonitorDOMTree(element: Element, matcher: Matcher<HTMLElement>) {
           node.nodeType === Node.ELEMENT_NODE &&
           matcher.match(node as HTMLElement).ok
         ) {
-          emit(MLO_ELEMENT_ADDED_EVENT, { detail: node })
+          emit(MLO_ELEMENT_ADDED_EVENT, node)
         }
       }
 
@@ -163,7 +167,7 @@ function MonitorDOMTree(element: Element, matcher: Matcher<HTMLElement>) {
           node.nodeType === Node.ELEMENT_NODE &&
           matcher.match(node as HTMLElement).ok
         ) {
-          emit(MLO_ELEMENT_REMOVED_EVENT, { detail: node })
+          emit(MLO_ELEMENT_REMOVED_EVENT, node)
         }
       }
     }

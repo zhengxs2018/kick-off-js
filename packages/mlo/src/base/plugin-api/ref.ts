@@ -153,7 +153,7 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
   })
 
   // Note: 允许外部在观察前取消观察，以避免不必要的性能开销
-  if (emit(MLO_OBJECT_BEFORE_OBSERVE_EVENT, { detail: self }) === false) {
+  if (emit(MLO_OBJECT_BEFORE_OBSERVE_EVENT, self) === false) {
     return self
   }
 
@@ -164,7 +164,7 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
 
   state.observed = true
 
-  emit(MLO_OBJECT_OBSERVED_EVENT, { detail: self })
+  emit(MLO_OBJECT_OBSERVED_EVENT, self)
 
   return self
 
@@ -208,11 +208,11 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
 
     if (source) {
       ObjectSources.delete(source)
-      emit(MLO_OBJECT_DISPOSED_EVENT, { detail: self })
+      emit(MLO_OBJECT_DISPOSED_EVENT, self)
     } else {
       state.collected = true
       state.collectedAt = Date.now()
-      emit(MLO_OBJECT_COLLECTED_EVENT, { detail: self })
+      emit(MLO_OBJECT_COLLECTED_EVENT, self)
     }
 
     return self
