@@ -26,8 +26,6 @@ export default function App() {
   const fetchData = useCallback(() => {
     const raw = mlo.toJSON()
 
-    console.log(raw)
-
     setData({
       timestamp: raw.timestamp,
       items: raw.items,
