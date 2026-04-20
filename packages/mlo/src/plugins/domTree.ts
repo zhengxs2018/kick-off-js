@@ -63,7 +63,10 @@ export function domTree(options?: DomTreeOptions): MloPluginObject {
       }
 
       const matcher = createMatcher<HTMLElement>(
-        options?.rules || [],
+        {
+          rules: options?.rules || [],
+          exclude: true,
+        },
         (node, check) => {
           if (check(node.id) || check(node.tagName.toLowerCase())) return true
 

@@ -24,7 +24,7 @@ import {
   MLO_OBJECT_COLLECTED_EVENT,
 } from './base/index.js'
 import type { MloEvents, MloInstance } from './types/mlo.js'
-import type { MloData, MloStats } from './types/snapshot.js'
+import type { MloData, MloStats, MloStatsSubItem } from './types/snapshot.js'
 import { untrack } from './base/plugin-api/tracker.js'
 
 const state = {
@@ -84,11 +84,11 @@ function use<P extends MloPlugin>(
   plugins.add(plugin)
 
   if (typeof plugin === 'function') {
-    ;(plugin as unknown as MloPluginObject) = plugin(options || {})
+    ; (plugin as unknown as MloPluginObject) = plugin(options || {})
   }
 
   if (isPluginObject(plugin)) {
-    ;(plugin as unknown as MloPluginObject).setup({ events, subscriptions })
+    ; (plugin as unknown as MloPluginObject).setup({ events, subscriptions })
   }
 }
 
@@ -181,50 +181,57 @@ function toJSON(): MloData {
   const items: MloObject[] = []
   const stats: MloStats = {}
 
+  const categories: Record<string, Record<string, MloStatsSubItem>> = {}
+
   for (const ref of values()) {
     const source = ref.deref()
     if (!source) continue
 
     items.push(ref.toJSON())
 
-    if (ref.type === 'element') {
-      stats.elements.total++
-
-      if (ref.detached) {
-        stats.elements.detached++
-      }
-
-      continue
-    }
-
-    if (ref.type === 'component') {
-      stats.components.total++
-
-      if (ref.detached) {
-        stats.components.detached++
-      }
-      continue
-    }
-
-    const item = getStatsItem(ref.category)
-    item.total++
-
-    if (ref.detached) {
-      item.detached++
-    }
+    setStatsItem(ref)
+    setStatsDetail(ref)
   }
+
+  Object.keys(categories).forEach((type) => {
+    const item = stats[type]
+    if (item) item.details = Object.values(categories[type])
+  })
 
   return { timestamp: Date.now(), items, stats }
 
-  function getStatsItem(type: string) {
-    let item = stats[type]
+  function setStatsDetail({ type, category, detached }: MloRef) {
+    const details = categories[category]
 
-    if (!item) {
-      item = { type, total: 0, detached: 0, details: [] }
-      stats[type] = item
+    if (!details) {
+      categories[category] = {
+        [type]: { label: type, count: 1, detached: detached ? 1 : 0 },
+      }
+      return
     }
 
-    return item
+    const item = details[type]
+
+    if (item) {
+      item.count++
+      if (detached) item.detached++
+    } else {
+      details[type] = { label: type, count: 1, detached: detached ? 1 : 0 }
+    }
+  }
+
+  function setStatsItem({ category, detached }: MloRef) {
+    let item = stats[category]
+
+    if (item) {
+      item.total++
+
+      if (detached) item.detached++
+    } else {
+      item = { type: category, total: 1, detached: detached ? 1 : 0, details: [] }
+      stats[category] = item
+    }
+
   }
 }
 

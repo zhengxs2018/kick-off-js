@@ -28,3 +28,8 @@ export type MatchResult = {
 export interface Matcher<T> extends DisposeLike {
   match(data: T): MatchResult
 }
+
+export type RuleExecutor = {
+  exec: (source: string) => boolean
+  reason: string
+}

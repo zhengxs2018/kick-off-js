@@ -1,18 +1,17 @@
-import type { Matcher, MatchResult, Rule } from '../../types/matcher.js'
+import type { Matcher, MatchResult, Rule, RuleExecutor } from '../../types/matcher.js'
 
-const NO_MATCH: MatchResult = Object.freeze({ ok: false })
-
-const MATCH_HIT = (reason: string): MatchResult => ({ ok: true, reason })
+export type MatcherOptions = {
+  rules: Rule[]
+  exclude?: boolean
+}
 
 export function createMatcher<T>(
-  rules: Rule[],
+  { rules, exclude }: MatcherOptions,
   predicate: (data: T, check: (part: string) => boolean) => boolean
 ): Matcher<T> {
-  const exactMap = new Map<string, string>()
+  const exactMap = new Map<string, MatchResult>()
 
   const executors: RuleExecutor[] = []
-
-  let currentReason: string | null = null
 
   for (const r of rules) {
     addRule(r)
@@ -20,13 +19,35 @@ export function createMatcher<T>(
 
   return {
     match(data: T): MatchResult {
-      currentReason = null
+      let result: MatchResult | undefined
 
-      if (predicate(data, check) && currentReason) {
-        return MATCH_HIT(currentReason)
+      if (predicate(data, check) && result) {
+        return result
       }
 
-      return NO_MATCH
+      return { ok: true }
+
+      function check(part: string): boolean {
+        if (!part) return false
+
+        if (exactMap.has(part)) {
+          result = exactMap.get(part)!
+          return true
+        }
+
+        let idx = executors.length
+
+        while (idx--) {
+          const item = executors[idx]
+
+          if (item.exec(part)) {
+            result = { ok: exclude !== true, reason: item.reason }
+            return true
+          }
+        }
+
+        return false
+      }
     },
     dispose() {
       exactMap.clear()
@@ -37,7 +58,7 @@ export function createMatcher<T>(
   function addRule(rule: Rule) {
     switch (rule.type) {
       case 'exact':
-        exactMap.set(rule.test, rule.reason)
+        exactMap.set(rule.test, { reason: rule.reason, ok: exclude !== true })
         break
       case 'starts':
         executors.push({
@@ -61,35 +82,11 @@ export function createMatcher<T>(
         const re = rule.test.global
           ? new RegExp(rule.test.source, rule.test.flags.replace('g', ''))
           : rule.test
-        executors.push({ exec: (s) => re.test(s), reason: rule.reason })
+        executors.push({
+          exec: (s) => re.test(s),
+          reason: rule.reason
+        })
         break
     }
   }
-
-  function check(part: string): boolean {
-    if (!part) return false
-
-    if (exactMap.has(part)) {
-      currentReason = exactMap.get(part)!
-      return true
-    }
-
-    let idx = executors.length
-
-    while (idx--) {
-      const item = executors[idx]
-
-      if (item.exec(part)) {
-        currentReason = item.reason
-        return true
-      }
-    }
-
-    return false
-  }
-}
-
-type RuleExecutor = {
-  exec: (source: string) => boolean
-  reason: string
 }

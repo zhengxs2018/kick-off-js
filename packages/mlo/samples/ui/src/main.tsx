@@ -13,10 +13,6 @@ createRoot(document.getElementById('root')!).render(
   </React.StrictMode>
 )
 
-mlo.events.onElementAdded((elem) => {
-  console.log(elem)
-})
-
 // 避免把 react 框架监听到
 setTimeout(() => {
   mlo.use(promises)
@@ -26,9 +22,9 @@ setTimeout(() => {
     monitor: true,
     scan: true,
     rules: [
-      { type: 'starts', test: 'style', reason: '' },
-      { type: 'starts', test: 'script', reason: '' },
-      { type: 'starts', test: 'noscript', reason: '' },
+      { type: 'exact', test: 'style', reason: '' },
+      { type: 'exact', test: 'script', reason: '' },
+      { type: 'exact', test: 'noscript', reason: '' },
     ],
   })
 
