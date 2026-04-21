@@ -1,11 +1,11 @@
-import { analyzePrototype, isObservable } from '../common/utils.js'
+import { analyzePrototype, isNil } from '../common/utils.js'
 import { inBrowser } from '../common/env.js'
 import { readonly, writable, constant, getter } from '../common/descriptors.js'
 import type { MloRef } from '../../types/ref.js'
 import type { MloObject } from '../../types/object.js'
 import { emit } from './event.js'
-import { ObjectSources, ObjectRefs } from './store.js'
-import { track, untrack } from './tracker.js'
+import { ObjectSources, ObjectRefs } from '../internal/store.js'
+import { track, untrack } from '../internal/tracker.js'
 import {
   MLO_OBJECT_BEFORE_OBSERVE_EVENT,
   MLO_OBJECT_COLLECTED_EVENT,
@@ -28,6 +28,27 @@ const RefSymbolKey = Symbol('MloRef')
  * @deprecated 内部API，请勿在外部使用
  */
 let idxCounter = 0
+
+const UnobservableTypes: string[] = [
+  'string',
+  'number',
+  'boolean',
+  'bigint',
+  'undefined',
+  'symbol',
+]
+
+export function isObservable(source: unknown): source is object | Function {
+  return isUnobservable(source) === false
+}
+
+export function isUnobservable(source: unknown): boolean {
+  return (
+    isNil(source) ||
+    source === globalThis ||
+    UnobservableTypes.includes(typeof source)
+  )
+}
 
 /**
  * 判断是否为对象引用
@@ -263,7 +284,7 @@ function ResolveObjectInfo(source: object, ref: WeakRef<object>) {
         className: source.constructor.name,
         extends: ['Element'],
       }),
-      detached: writable(() => (ref.deref() as Element)?.isConnected ?? false),
+      detached: getter(() => (ref.deref() as Element)?.isConnected ?? false),
     }
   }
 

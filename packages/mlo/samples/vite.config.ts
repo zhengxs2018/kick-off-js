@@ -8,12 +8,11 @@ import tailwindcss from '@tailwindcss/vite'
  * @see https://vitejs.dev/
  */
 export default defineConfig({
-  mode: 'production',
   root: __dirname,
   plugins: [tailwindcss(), react()],
   resolve: {
     alias: {
-      '@zhengxs/mlo': resolve(__dirname, '../../src/index.js'),
+      '@': resolve(__dirname, 'ui/src'),
     },
   },
   server: {

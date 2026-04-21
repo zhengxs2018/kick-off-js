@@ -1,4 +1,4 @@
-import type { DisposeLike } from './event.js'
+import type { DisposeLike } from '../base/common/events.js'
 import type { MloEvents } from './mlo.js'
 
 export type MloSetupContext = {

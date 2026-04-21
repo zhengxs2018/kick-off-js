@@ -1,11 +1,16 @@
 {
   "extends": "@zhengxs/tsconfig/dom",
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "tsBuildInfoFile": "./node_modules/tsconfig.tsbuildinfo",
     "jsx": "react",
     "jsxFactory": "React.createElement",
-    "types": ["node", "vite/client", "react", "react-dom"],
+    "types": ["vite/client", "react", "react-dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./ui/src/*"]
+    },
     "noEmit": true
   },
-  "include": ["src"]
+  "include": ["node", "ui", "client"]
 }

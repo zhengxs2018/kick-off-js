@@ -1,4 +1,4 @@
-import type { Matcher } from '../../types/matcher.js'
+import type { Matcher } from '../common/matcher.js'
 import { MLO_ELEMENT_ADDED_EVENT } from './consts.js'
 import { emit } from './event.js'
 

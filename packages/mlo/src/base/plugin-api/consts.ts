@@ -1,3 +1,7 @@
+export const MLO_MESSAGE_EVENT_SCHEMA = 'mlo:message:event'
+
+export const MLO_BROADCAST_CHANNEL_NAME = 'mlo:broadcast:message'
+
 export const MLO_OBJECT_BEFORE_OBSERVE_EVENT = Symbol(
   'mlo:object:beforeObserve'
 )

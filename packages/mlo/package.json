@@ -1,6 +1,6 @@
 {
   "name": "@zhengxs/mlo",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": "zhengxs2018",
   "license": "MIT",
   "type": "module",
@@ -18,7 +18,7 @@
     "types": "./dist-types/index.d.ts"
   },
   "scripts": {
-    "serve": "cd samples/ui && pnpm dev",
+    "serve": "cd samples && pnpm dev",
     "build": "tsc --build",
     "watch": "tsc --build --watch",
     "format": "prettier src --write --log-level warn --ignore-path ../../.prettierignore",

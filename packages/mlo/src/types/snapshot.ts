@@ -1,7 +1,7 @@
 import type { MloObject } from './object.js'
 
-export interface MloData {
-  stats: MloStats
+export interface MloSnapshot {
+  stats: MloStatsItem[]
   items: MloObject[]
   timestamp: number
 }

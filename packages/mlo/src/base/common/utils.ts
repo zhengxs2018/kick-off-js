@@ -1,33 +1,7 @@
-import type { MloPluginObject } from '../../types/plugin.js'
 import { inBrowser } from './env.js'
 
 const OBJ_PROTO = Object.prototype
 const ELEM_PROTO = inBrowser ? Element.prototype : null
-
-const UnobservableTypes: string[] = [
-  'string',
-  'number',
-  'boolean',
-  'bigint',
-  'undefined',
-  'symbol',
-]
-
-export function isObservable(source: unknown): source is object | Function {
-  return isUnobservable(source) === false
-}
-
-export function isUnobservable(source: unknown): boolean {
-  return (
-    isNil(source) ||
-    source === globalThis ||
-    UnobservableTypes.includes(typeof source)
-  )
-}
-
-export function isPluginObject(plugin: unknown): plugin is MloPluginObject {
-  return isObject<MloPluginObject>(plugin) && isFunction(plugin.setup)
-}
 
 export function isNil(o: unknown): o is null | undefined {
   return o === null || o === undefined

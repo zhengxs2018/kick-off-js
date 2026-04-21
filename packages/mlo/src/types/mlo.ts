@@ -1,39 +1,47 @@
-import type { DisposeLike, MloEventListener } from './event.js'
+import type { DisposeLike, EventListener } from '../base/common/events.js'
+import type { MloObject } from './object.js'
 import type { MloExtractPluginOptions, MloPlugin } from './plugin.js'
 import type { MloRef } from './ref.js'
-import type { MloData } from './snapshot.js'
+import type { MloStats } from './snapshot.js'
+
+export interface MloData {
+  stats: MloStats
+  items: MloObject[]
+  timestamp: number
+}
+
 
 export interface MloEvents {
   onElementAdded(
-    listener: MloEventListener<Element>,
+    listener: EventListener<Element>,
     options?: boolean | AddEventListenerOptions
   ): DisposeLike
   onElementRemoved(
-    listener: MloEventListener<Element>,
+    listener: EventListener<Element>,
     options?: boolean | AddEventListenerOptions
   ): DisposeLike
   onObjectObserve(
-    listener: MloEventListener<MloRef>,
+    listener: EventListener<MloRef>,
     options?: boolean | AddEventListenerOptions
   ): DisposeLike
   onObjectObserved(
-    listener: MloEventListener<MloRef>,
+    listener: EventListener<MloRef>,
     options?: boolean | AddEventListenerOptions
   ): DisposeLike
   onObjectUnobserved(
-    listener: MloEventListener<MloRef>,
+    listener: EventListener<MloRef>,
     options?: boolean | AddEventListenerOptions
   ): DisposeLike
   onObjectCollected(
-    listener: MloEventListener<MloRef>,
+    listener: EventListener<MloRef>,
     options?: boolean | AddEventListenerOptions
   ): DisposeLike
   onComponentMounted(
-    listener: MloEventListener<unknown>,
+    listener: EventListener<unknown>,
     options?: boolean | AddEventListenerOptions
   ): DisposeLike
   onComponentUnmounted(
-    listener: MloEventListener<unknown>,
+    listener: EventListener<unknown>,
     options?: boolean | AddEventListenerOptions
   ): DisposeLike
 }

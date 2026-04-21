@@ -6,13 +6,12 @@ import {
   NativeMutationObserver,
   scanDOMTree,
   ref,
-} from '../base/index.js'
-import {
+  createMatcher,
   MLO_ELEMENT_ADDED_EVENT,
   MLO_ELEMENT_REMOVED_EVENT,
-} from '../base/plugin-api/consts.js'
-import type { Matcher, Rule } from '../types/matcher.js'
-import { createMatcher } from '../base/plugin-api/matcher.js'
+  type Matcher,
+  type Rule,
+} from '../base/index.js'
 
 export type DomTreeOptions = {
   /**

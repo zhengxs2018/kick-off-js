@@ -1,18 +1,21 @@
 import { ref } from './base/plugin-api/ref.js'
-import { ObjectSources, ObjectRefs } from './base/plugin-api/store.js'
+import { ObjectSources, ObjectRefs } from './base/internal/store.js'
 import { createEvent, disposeAll } from './base/plugin-api/event.js'
-import { isPluginObject, noop } from './base/common/utils.js'
+import { noop } from './base/common/utils.js'
+import { isPluginObject } from './base/plugin-api/plugin.js'
 import type { MloRef } from './types/ref.js'
-import type { MloObject } from './types/object.js'
 import type {
   MloPlugin,
   MloExtractPluginOptions,
   MloPluginObject,
 } from './types/plugin.js'
-import type { DisposeLike } from './types/event.js'
+import type { DisposeLike } from './base/common/events.js'
 import {
   constant,
   getter,
+  readonly,
+} from './base/common/descriptors.js'
+import {
   MLO_OBJECT_BEFORE_OBSERVE_EVENT,
   MLO_OBJECT_DISPOSED_EVENT,
   MLO_OBJECT_OBSERVED_EVENT,
@@ -20,12 +23,12 @@ import {
   MLO_ELEMENT_REMOVED_EVENT,
   MLO_COMPONENT_MOUNTED_EVENT,
   MLO_COMPONENT_UNMOUNTED_EVENT,
-  readonly,
   MLO_OBJECT_COLLECTED_EVENT,
-} from './base/index.js'
-import type { MloEvents, MloInstance } from './types/mlo.js'
-import type { MloData, MloStats, MloStatsSubItem } from './types/snapshot.js'
-import { untrack } from './base/plugin-api/tracker.js'
+} from './base/plugin-api/consts.js'
+import type { MloData, MloEvents, MloInstance } from './types/mlo.js'
+import { untrack } from './base/internal/tracker.js'
+import type { MloStats, MloStatsSubItem } from './types/snapshot.js'
+import type { MloObject } from './types/object.js'
 
 const state = {
   disposed: false,

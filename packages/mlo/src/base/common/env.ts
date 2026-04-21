@@ -4,6 +4,8 @@
 export const inBrowser =
   typeof window !== 'undefined' && typeof window.document !== 'undefined'
 
+export const inIframe = inBrowser && window.self !== window.top && typeof window.parent !== 'undefined'
+
 /**
  * 是否在 Node.js 环境中
  */
