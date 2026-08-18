@@ -1,12 +1,15 @@
 {
-  "extends": "@zhengxs/tsconfig/lib",
   "compilerOptions": {
-    "outDir": "dist",
-    "declarationDir": "dist-types",
-    "tsBuildInfoFile": "./node_modules/tsconfig.tsbuildinfo",
-    "lib": ["esnext", "dom"],
-    "types": ["@dcloudio/types", "node"],
-    "noEmit": false,
+    "strict": true
   },
-  "include": ["src"]
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig.build.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

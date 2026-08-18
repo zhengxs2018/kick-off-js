@@ -1,20 +1,12 @@
-import { ref } from './base/plugin-api/ref.js'
-import { ObjectSources, ObjectRefs } from './base/internal/store.js'
-import { createEvent, disposeAll } from './base/plugin-api/event.js'
-import { noop } from './base/common/utils.js'
-import { isPluginObject } from './base/plugin-api/plugin.js'
-import type { MloRef } from './types/ref.js'
-import type {
-  MloPlugin,
-  MloExtractPluginOptions,
-  MloPluginObject,
-} from './types/plugin.js'
-import type { DisposeLike } from './base/common/events.js'
-import {
-  constant,
-  getter,
-  readonly,
-} from './base/common/descriptors.js'
+import { ref } from './base/plugin-api/ref.js';
+import { ObjectSources, ObjectRefs } from './base/internal/store.js';
+import { createEvent, disposeAll } from './base/plugin-api/event.js';
+import { noop } from './base/common/utils.js';
+import { isPluginObject } from './base/plugin-api/plugin.js';
+import type { MloRef } from './types/ref.js';
+import type { MloPlugin, MloExtractPluginOptions, MloPluginObject } from './types/plugin.js';
+import type { DisposeLike } from './base/common/events.js';
+import { constant, getter, readonly } from './base/common/descriptors.js';
 import {
   MLO_OBJECT_BEFORE_OBSERVE_EVENT,
   MLO_OBJECT_DISPOSED_EVENT,
@@ -24,17 +16,17 @@ import {
   MLO_COMPONENT_MOUNTED_EVENT,
   MLO_COMPONENT_UNMOUNTED_EVENT,
   MLO_OBJECT_COLLECTED_EVENT,
-} from './base/plugin-api/consts.js'
-import type { MloData, MloEvents, MloInstance } from './types/mlo.js'
-import { untrack } from './base/internal/tracker.js'
-import type { MloStats, MloStatsSubItem } from './types/snapshot.js'
-import type { MloObject } from './types/object.js'
+} from './base/plugin-api/consts.js';
+import type { MloData, MloEvents, MloInstance } from './types/mlo.js';
+import { untrack } from './base/internal/tracker.js';
+import type { MloStats, MloStatsSubItem } from './types/snapshot.js';
+import type { MloObject } from './types/object.js';
 
 const state = {
   disposed: false,
-}
+};
 
-const plugins = new Set<MloPlugin>()
+const plugins = new Set<MloPlugin>();
 
 const events: MloEvents = {
   onObjectObserve: createEvent<MloRef>(MLO_OBJECT_BEFORE_OBSERVE_EVENT),
@@ -45,15 +37,15 @@ const events: MloEvents = {
   onElementRemoved: createEvent<Element>(MLO_ELEMENT_REMOVED_EVENT),
   onComponentMounted: createEvent<unknown>(MLO_COMPONENT_MOUNTED_EVENT),
   onComponentUnmounted: createEvent<unknown>(MLO_COMPONENT_UNMOUNTED_EVENT),
-}
+};
 
 const subscriptions: Array<DisposeLike | (() => void)> = [
   () => {
     for (const ref of values()) {
-      if (!ref.disposed) ref.dispose()
+      if (!ref.disposed) ref.dispose();
     }
   },
-]
+];
 
 export const mlo: MloInstance = Object.create(null, {
   events: readonly(events),
@@ -73,182 +65,174 @@ export const mlo: MloInstance = Object.create(null, {
   [Symbol.toStringTag]: constant('MLO'),
   [Symbol.dispose]: constant(dispose),
   [Symbol.iterator]: constant(values),
-})
+});
 
-function use(plugin: MloPlugin, options?: object): void
-function use<P extends MloPlugin>(
-  plugin: P,
-  options?: MloExtractPluginOptions<P>
-): void {
-  throwIfDisposed('use')
+function use(plugin: MloPlugin, options?: object): void;
+function use<P extends MloPlugin>(plugin: P, options?: MloExtractPluginOptions<P>): void {
+  throwIfDisposed('use');
 
-  if (plugins.has(plugin)) return
+  if (plugins.has(plugin)) return;
 
-  plugins.add(plugin)
+  plugins.add(plugin);
 
   if (typeof plugin === 'function') {
-    ; (plugin as unknown as MloPluginObject) = plugin(options || {})
+    (plugin as unknown as MloPluginObject) = plugin(options || {});
   }
 
   if (isPluginObject(plugin)) {
-    ; (plugin as unknown as MloPluginObject).setup({ events, subscriptions })
+    (plugin as unknown as MloPluginObject).setup({ events, subscriptions });
   }
 }
 
 function get<T extends object>(source: T): MloRef<T> | undefined {
-  return state.disposed
-    ? undefined
-    : (ObjectSources.get(source) as MloRef<T> | undefined)
+  return state.disposed ? undefined : (ObjectSources.get(source) as MloRef<T> | undefined);
 }
 
 function key<T extends object>(id: number): MloRef<T> | undefined {
-  return state.disposed
-    ? undefined
-    : (ObjectRefs.get(id) as MloRef<T> | undefined)
+  return state.disposed ? undefined : (ObjectRefs.get(id) as MloRef<T> | undefined);
 }
 
-function observe(source: null | undefined): undefined
-function observe(source: string | number | boolean | bigint | symbol): undefined
-function observe(source: typeof globalThis): undefined
-function observe<T extends Function>(source: T): MloRef<T>
-function observe<T extends object>(source: T): MloRef<T>
+function observe(source: null | undefined): undefined;
+function observe(source: string | number | boolean | bigint | symbol): undefined;
+function observe(source: typeof globalThis): undefined;
+function observe<T extends Function>(source: T): MloRef<T>;
+function observe<T extends object>(source: T): MloRef<T>;
 function observe(source: unknown): MloRef | undefined {
-  throwIfDisposed('source')
-  return ref(source as object)
+  throwIfDisposed('source');
+  return ref(source as object);
 }
 
 function unobserve<T extends object>(source: T): MloRef<T> | undefined {
-  if (state.disposed) return
+  if (state.disposed) return;
 
-  const ref = ObjectSources.get(source) as MloRef<T> | undefined
+  const ref = ObjectSources.get(source) as MloRef<T> | undefined;
 
-  if (ref) return ref.dispose()
+  if (ref) return ref.dispose();
 
-  console.warn(`Attempting to unobserve an unobserved object:`, source)
+  console.warn(`Attempting to unobserve an unobserved object:`, source);
 
-  return void 0
+  return void 0;
 }
 
 function flush() {
-  if (state.disposed) return 0
+  if (state.disposed) return 0;
 
-  let cleaned = 0
+  let cleaned = 0;
 
   for (const ref of new Set(ObjectRefs.values())) {
-    if ((ref.flush(), ref.collected)) cleaned++
+    if ((ref.flush(), ref.collected)) cleaned++;
   }
 
-  return cleaned
+  return cleaned;
 }
 
 function takeRecords(predicate: (ref: MloRef) => unknown = noop) {
-  const records: MloRef[] = []
+  const records: MloRef[] = [];
 
-  if (state.disposed) return records
+  if (state.disposed) return records;
 
   for (const ref of values(predicate)) {
-    records.push(ref)
+    records.push(ref);
 
-    untrack(ref)
-    ObjectRefs.delete(ref.id)
+    untrack(ref);
+    ObjectRefs.delete(ref.id);
 
-    const source = ref.deref()!
-    if (source) ObjectSources.delete(source)
+    const source = ref.deref()!;
+    if (source) ObjectSources.delete(source);
   }
 
-  return records
+  return records;
 }
 
 function* values(predicate: (ref: MloRef) => unknown = noop) {
-  if (state.disposed) return
+  if (state.disposed) return;
 
   for (const ref of new Set(ObjectRefs.values())) {
-    ref.flush()
+    ref.flush();
 
-    if (ref.collected) continue
+    if (ref.collected) continue;
 
-    const flag = predicate(ref)
+    const flag = predicate(ref);
 
-    if (flag === true) continue
-    if (flag === false) break
+    if (flag === true) continue;
+    if (flag === false) break;
 
-    yield ref
+    yield ref;
   }
 }
 
 function toString(): string {
-  return `[object MLO]`
+  return `[object MLO]`;
 }
 
 function toJSON(): MloData {
-  const items: MloObject[] = []
-  const stats: MloStats = {}
+  const items: MloObject[] = [];
+  const stats: MloStats = {};
 
-  const categories: Record<string, Record<string, MloStatsSubItem>> = {}
+  const categories: Record<string, Record<string, MloStatsSubItem>> = {};
 
   for (const ref of values()) {
-    const source = ref.deref()
-    if (!source) continue
+    const source = ref.deref();
+    if (!source) continue;
 
-    items.push(ref.toJSON())
+    items.push(ref.toJSON());
 
-    setStatsItem(ref)
-    setStatsDetail(ref)
+    setStatsItem(ref);
+    setStatsDetail(ref);
   }
 
-  Object.keys(categories).forEach((type) => {
-    const item = stats[type]
-    if (item) item.details = Object.values(categories[type])
-  })
+  Object.keys(categories).forEach(type => {
+    const item = stats[type];
+    if (item) item.details = Object.values(categories[type]!);
+  });
 
-  return { timestamp: Date.now(), items, stats }
+  return { timestamp: Date.now(), items, stats };
 
   function setStatsDetail({ type, category, detached }: MloRef) {
-    const details = categories[category]
+    const details = categories[category];
 
     if (!details) {
       categories[category] = {
         [type]: { label: type, count: 1, detached: detached ? 1 : 0 },
-      }
-      return
+      };
+      return;
     }
 
-    const item = details[type]
+    const item = details[type];
 
     if (item) {
-      item.count++
-      if (detached) item.detached++
+      item.count++;
+      if (detached) item.detached++;
     } else {
-      details[type] = { label: type, count: 1, detached: detached ? 1 : 0 }
+      details[type] = { label: type, count: 1, detached: detached ? 1 : 0 };
     }
   }
 
   function setStatsItem({ category, detached }: MloRef) {
-    let item = stats[category]
+    let item = stats[category];
 
     if (item) {
-      item.total++
+      item.total++;
 
-      if (detached) item.detached++
+      if (detached) item.detached++;
     } else {
-      item = { type: category, total: 1, detached: detached ? 1 : 0, details: [] }
-      stats[category] = item
+      item = { type: category, total: 1, detached: detached ? 1 : 0, details: [] };
+      stats[category] = item;
     }
-
   }
 }
 
 function dispose() {
-  if (state.disposed) return
+  if (state.disposed) return;
 
-  disposeAll(subscriptions)
-  subscriptions.length = 0
+  disposeAll(subscriptions);
+  subscriptions.length = 0;
 
-  state.disposed = true
+  state.disposed = true;
 }
 
 function throwIfDisposed(method: string) {
   if (state.disposed) {
-    throw new Error(`Cannot call mlo.${method}() on a disposed instance.`)
+    throw new Error(`Cannot call mlo.${method}() on a disposed instance.`);
   }
 }

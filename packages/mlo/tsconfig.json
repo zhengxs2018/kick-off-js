@@ -1,10 +1,15 @@
 {
-  "extends": "@zhengxs/tsconfig/node",
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/tsconfig.tsbuildinfo",
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "declarationDir": "./dist-types"
+    "strict": true
   },
-  "include": ["./src"]
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig.build.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }
