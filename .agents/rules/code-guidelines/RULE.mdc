@@ -1,0 +1,129 @@
+---
+description: 代码规范：注释规范 + 函数/方法风格（禁止尾部 export、箭头函数属性、?: 可选方法写法）
+alwaysApply: true
+enabled: true
+---
+
+# 代码规范
+
+## 一、注释规范
+
+- 源文件内只保留以下实现级注释，其余一律删除：
+  - 待办与故障标记：`TODO`、`FIXME`、`HACK`、`BUG`、`ERROR` 及其后简述。
+  - 非显而易见的「为何」说明：仅限异常安全、跨模块约定、合规约束等，遵循「只解释为何」原则。
+- **禁止一切 lint 指令注释**：`/* eslint-disable ... */`、`/* eslint-enable ... */`、`// eslint-disable-next-line`、`@ts-*`、`@ts-expect-error`、`@ts-ignore` 等一律删除；其背后若确有真实 lint 问题，改为修复代码而非压制。
+- 行内解释性注释（`// 做什么`）、文件头块注释（`/** ... */` 文件级说明）一律删除，代码自解释。
+- 删除注释掉的死代码、修改记录/作者/日期注释、复述代码的提示性注释（如 `// 读取`、`// 循环`）。
+
+### 公开 API 必须 TSDoc 块注释（强制）
+
+导出函数、类、接口、类型（即对外契约）**必须**用标准 TSDoc 多行块注释（`/** ... */`）标注，给人类阅读的 API 文档。内部/私有实现不强制。
+
+- `@param` 描述用 `-` 隔开参数名与说明：`@param name - 说明`（禁止 `:` 或纯空格分隔）。
+- 非显而易见的语义约束、设计权衡用 `-` 列表写在块注释正文，与代码行为一致（文档与签名/实现冲突即违规）。
+- 必须含 `@param`（每个形参）与 `@returns`；可能抛错时含 `@throws`。
+
+```ts
+/**
+ * 按分隔符截取字符串
+ *
+ * - 非字符串返回空串
+ * - 不同于 `Array/String` 的 `find`，是截取子串而非查找元素
+ * - 支持单参或双参，缺失前界时返回原值，缺失后界取到末尾
+ *
+ * @param input - 待截取的值
+ * @param before - 前界分隔符
+ * @param after - 后界分隔符，缺省取到末尾
+ * @returns 截取出的子串；未找到前界返回空串。
+ */
+export function find(input: unknown, before?: string, after?: string): unknown {
+  if (typeof input !== 'string') {
+    return '';
+  }
+  if (before === undefined) {
+    return input;
+  }
+  const start = input.indexOf(before);
+  if (start === -1) {
+    return '';
+  }
+  const from = start + before.length;
+  if (after === undefined) {
+    return input.slice(from);
+  }
+  const end = input.indexOf(after, from);
+  return end === -1 ? input.slice(from) : input.slice(from, end);
+}
+```
+
+## 二、代码风格（强制：干净 + 高性能）
+
+- **干净**：参数直接具名提取，禁止 `args[0]`/`args[1]` 索引访问与 `args.length` 分支判断；可变长参数解构为具名（`const [first, second] = args`）或改为具名形参（`(input, before?, after?)`）。
+- **高性能**：避免不必要的数组拷贝与重复遍历；优先 `indexOf`/`slice` 等原生 O(n) 操作；早返回扁平化分支，禁止深层嵌套 `if`。
+- 一个函数只做一件事；实现超过约 30 行拆分；参数不超过 3 个，超出用 options 对象聚合。
+- 优先纯函数；有副作用的函数名显式表达意图（`save*`/`write*`/`update*`）。
+
+## 二、函数与方法风格（强制）
+
+### 规则 1：导出函数直接 `export`，禁止尾部 `export {}`
+
+顶层导出函数/类使用前置 `export function` / `export class`，不得在文件底部用 `export { name }` 集中重导出。
+
+```ts
+// 正确
+export function createRpcProxy(send: RpcSender): RpcProxy {
+  return new Proxy(target, { get(t, prop) { return Reflect.get(t, prop); } });
+}
+
+// 错误
+function createRpcProxy(send: RpcSender): RpcProxy { /* ... */ }
+export { createRpcProxy };
+```
+
+### 规则 2：对象方法/内部函数用 `function` 声明，禁止箭头函数属性
+
+- 对象字面量、Proxy handler、接口实现中的方法用**简写属性** `method() {}`，禁止 `method: () => {}` 箭头属性。
+- 函数内部需要复用的子函数，定义在 `return` 语句**之后**，用 `function` 声明（提前返回/闭包捕获外层变量均合法）。
+- 仅当确实需要绑定 `this` 或作为一次性回调（如 `addEventListener`、`then` 回调）时才用箭头函数；接口/类型签名中的函数类型标注（`(x: T) => void`）不在此限。
+
+```ts
+export function counter() {
+  return {
+    add(n: number) {
+      total += n;
+    },
+  };
+
+  function add(n: number) {
+    total += n;
+  }
+}
+
+// 错误
+const counter = () => ({
+  add: (n: number) => { total += n; },
+});
+```
+
+### 规则 3：可选方法用 `?` 简写属性，禁止 `?:` 函数类型写法
+
+接口/类型中声明可选方法时，用 `method?(args): ReturnType` 简写形式，禁止 `method?:(args) => ReturnType` 的函数类型写法。
+
+```ts
+interface Transport {
+  onMessage(handler: (message: TransportMessage) => void): void;   // 必选方法简写
+  onDisconnect?(handler: () => void): void;                         // 正确：? 简写属性
+}
+
+// 错误
+interface Transport {
+  onDisconnect?: (handler: () => void) => void;   // 禁止：?: 函数类型写法
+}
+```
+
+- 普通可选**数据字段**（非方法）仍可用 `field?: T`。
+- 仅方法类成员强制使用 `name?(args): R` 形式，不使用 `name?: (args) => R`。
+- **`readonly` 修饰符约束**：`readonly` 只能修饰属性声明或索引签名，不能修饰方法简写（`readonly onDisconnect?(): void` 或 `readonly onDisconnect(): void` 均编译报错）。因此：
+  - 带 `readonly` 的接口字段**保持字段形式**：`readonly postMessage: (payload: RpcRequest) => void;`（即使它是函数类型也不得改为方法简写）。
+  - 仅**不带 `readonly` 的方法成员**才适用 `?()` 简写（如 `messaging/transport.ts` 的 `onDisconnect?(): void`）。
+  - 实现对象（非接口 `readonly`）里的方法用规则 2 的简写 `method() {}`。

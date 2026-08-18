@@ -2,27 +2,35 @@
   "name": "@zhengxs/vm",
   "version": "0.1.0",
   "description": "zhengxs - A browser sandbox based on Proxy",
-  "author": "zhengxs2018",
   "license": "MIT",
-  "sideEffects": false,
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "author": "zhengxs2018",
   "files": [
-    "dist"
+    "dist",
+    "dist-types"
   ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "types": "./dist-types/index.d.ts"
+  },
   "scripts": {
-    "build": "vite build",
-    "watch": "vite build --mode development --watch",
-    "format": "prettier src samples --write --log-level warn",
-    "clean:bundle": "rimraf dist dist-types",
-    "prepublishOnly": "pnpm build && clean-publish",
-    "postpublish": "rimraf ./package"
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json",
+    "clean:bundle": "rimraf dist dist-types package",
+    "prepublishOnly": "bun run clean:bundle && bun run build && clean-publish",
+    "postpublish": "bun run clean:bundle"
   },
   "dependencies": {
     "@zhengxs/shared": "workspace:^"
   },
   "devDependencies": {
-    "@zhengxs/tsconfig": "workspace:^"
+    "@zhengxs/tsconfig": "workspace:^",
+    "vite": "^8.0.9",
+    "vite-plugin-checker": "^0.6.4",
+    "vite-plugin-dts": "^3.6.0",
+    "vite-plugin-externalize-deps": "^0.7.0"
   }
 }

@@ -1,17 +1,17 @@
-import { analyzePrototype, isNil } from '../common/utils.js'
-import { inBrowser } from '../common/env.js'
-import { readonly, writable, constant, getter } from '../common/descriptors.js'
-import type { MloRef } from '../../types/ref.js'
-import type { MloObject } from '../../types/object.js'
-import { emit } from './event.js'
-import { ObjectSources, ObjectRefs } from '../internal/store.js'
-import { track, untrack } from '../internal/tracker.js'
+import { analyzePrototype, isNil } from '../common/utils.js';
+import { inBrowser } from '../common/env.js';
+import { readonly, writable, constant, getter } from '../common/descriptors.js';
+import type { MloRef } from '../../types/ref.js';
+import type { MloObject } from '../../types/object.js';
+import { emit } from './event.js';
+import { ObjectSources, ObjectRefs } from '../internal/store.js';
+import { track, untrack } from '../internal/tracker.js';
 import {
   MLO_OBJECT_BEFORE_OBSERVE_EVENT,
   MLO_OBJECT_COLLECTED_EVENT,
   MLO_OBJECT_DISPOSED_EVENT,
   MLO_OBJECT_OBSERVED_EVENT,
-} from './consts.js'
+} from './consts.js';
 
 /**
  * 是否对象引用
@@ -19,7 +19,7 @@ import {
  * @internal
  * @deprecated 内部API，请勿在外部使用
  */
-const RefSymbolKey = Symbol('MloRef')
+const RefSymbolKey = Symbol('MloRef');
 
 /**
  * 对象引用索引计数器
@@ -27,7 +27,7 @@ const RefSymbolKey = Symbol('MloRef')
  * @internal
  * @deprecated 内部API，请勿在外部使用
  */
-let idxCounter = 0
+let idxCounter = 0;
 
 const UnobservableTypes: string[] = [
   'string',
@@ -36,18 +36,14 @@ const UnobservableTypes: string[] = [
   'bigint',
   'undefined',
   'symbol',
-]
+];
 
 export function isObservable(source: unknown): source is object | Function {
-  return isUnobservable(source) === false
+  return isUnobservable(source) === false;
 }
 
 export function isUnobservable(source: unknown): boolean {
-  return (
-    isNil(source) ||
-    source === globalThis ||
-    UnobservableTypes.includes(typeof source)
-  )
+  return isNil(source) || source === globalThis || UnobservableTypes.includes(typeof source);
 }
 
 /**
@@ -57,7 +53,7 @@ export function isUnobservable(source: unknown): boolean {
  * @returns 如果值是对象引用，则返回 true；否则返回 false
  */
 export function isRef(value: any): value is MloRef {
-  return !!(value && value[RefSymbolKey] === true)
+  return !!(value && value[RefSymbolKey] === true);
 }
 
 /**
@@ -68,19 +64,14 @@ export function isRef(value: any): value is MloRef {
  * @param source - 源对象
  * @returns 对象引用或 undefined
  */
-export function ref(source: null | undefined): undefined
-export function ref(
-  source: string | number | boolean | bigint | symbol
-): undefined
-export function ref(source: typeof globalThis): undefined
-export function ref<T extends Function>(source: T): MloRef<T>
-export function ref<T extends object>(source: T): MloRef<T>
+export function ref(source: null | undefined): undefined;
+export function ref(source: string | number | boolean | bigint | symbol): undefined;
+export function ref(source: typeof globalThis): undefined;
+export function ref<T extends Function>(source: T): MloRef<T>;
+export function ref<T extends object>(source: T): MloRef<T>;
 export function ref(source: unknown): MloRef | undefined {
-  if (isObservable(source) === false) return undefined
-  return (
-    (ObjectSources.get(source) as MloRef | undefined) ||
-    CreateRef(source as object)
-  )
+  if (isObservable(source) === false) return undefined;
+  return (ObjectSources.get(source) as MloRef | undefined) || CreateRef(source as object);
 }
 
 /**
@@ -92,9 +83,9 @@ export function ref(source: unknown): MloRef | undefined {
  * @returns 解除引用后的对象引用或 undefined
  */
 export function unref<T extends object>(ref: MloRef<T>): MloRef<T> | undefined {
-  if (isRef(ref) && !ref.disposed) return ref.dispose()
-  console.trace(`Attempting to unref an Non-ref object:`, ref)
-  return void 0
+  if (isRef(ref) && !ref.disposed) return ref.dispose();
+  console.trace(`Attempting to unref an Non-ref object:`, ref);
+  return void 0;
 }
 
 /**
@@ -106,16 +97,16 @@ export function unref<T extends object>(ref: MloRef<T>): MloRef<T> | undefined {
  * @returns 对象引用或 null
  */
 function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
-  const id = idxCounter++
+  const id = idxCounter++;
 
   const state = {
     observed: true,
     collected: false,
     collectedAt: null as number | null,
     disposed: false,
-  }
+  };
 
-  const target = new WeakRef(source)
+  const target = new WeakRef(source);
 
   const self: MloRef<T> = Object.create(null, {
     ...ResolveObjectInfo(source, target),
@@ -129,40 +120,40 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
     createdAt: readonly(Date.now()),
     disposed: getter(() => state.disposed),
     linkTo: constant(function link(target: MloRef): MloRef<T> {
-      if (self.disposed || target === self) return self
+      if (self.disposed || target === self) return self;
 
       if (isRef(self)) {
-        self.links.add(target.id)
-        target.links.add(self.id)
+        self.links.add(target.id);
+        target.links.add(self.id);
       } else {
-        console.trace(`Attempting to link an Non-ref object:`, target)
+        console.trace(`Attempting to link an Non-ref object:`, target);
       }
 
-      return self
+      return self;
     }),
     unlink: constant(function unlink(target: MloRef): MloRef<T> {
-      if (self.disposed || target === self) return self
+      if (self.disposed || target === self) return self;
 
       if (isRef(target)) {
-        self.links.delete(target.id)
-        target.links.delete(self.id)
+        self.links.delete(target.id);
+        target.links.delete(self.id);
       } else {
-        console.trace(`Attempting to unlink an Non-ref object:`, target)
+        console.trace(`Attempting to unlink an Non-ref object:`, target);
       }
 
-      return self
+      return self;
     }),
     deref: constant((): T | undefined => {
-      if (state.disposed) return undefined
+      if (state.disposed) return undefined;
 
-      const source = target.deref()
-      return source ? source : void dispose()
+      const source = target.deref();
+      return source ? source : void dispose();
     }),
     flush: constant((): undefined => {
-      if (state.disposed) return undefined
+      if (state.disposed) return undefined;
 
-      const source = target.deref()
-      return source ? undefined : void dispose()
+      const source = target.deref();
+      return source ? undefined : void dispose();
     }),
     toString: constant(toString),
     toJSON: constant(toJSON),
@@ -171,26 +162,26 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
     [Symbol.toStringTag]: constant('MloRef'),
     [Symbol.toPrimitive]: constant(toString),
     [Symbol.dispose]: constant(dispose),
-  })
+  });
 
   // Note: 允许外部在观察前取消观察，以避免不必要的性能开销
   if (emit(MLO_OBJECT_BEFORE_OBSERVE_EVENT, self) === false) {
-    return self
+    return self;
   }
 
-  track(source, self)
+  track(source, self);
 
-  ObjectRefs.set(id, self)
-  ObjectSources.set(source, self)
+  ObjectRefs.set(id, self);
+  ObjectSources.set(source, self);
 
-  state.observed = true
+  state.observed = true;
 
-  emit(MLO_OBJECT_OBSERVED_EVENT, self)
+  emit(MLO_OBJECT_OBSERVED_EVENT, self);
 
-  return self
+  return self;
 
   function toString(): string {
-    return `${self.type}#${self.name}<${self.id}>`
+    return `${self.type}#${self.name}<${self.id}>`;
   }
 
   function toJSON(): MloObject {
@@ -209,34 +200,34 @@ function CreateRef<T extends object>(source: T): MloRef<T> | undefined {
       createdAt: self.createdAt,
       collected: self.collected,
       collectedAt: self.collectedAt,
-    }
+    } as MloObject;
   }
 
   function dispose(): MloRef<T> {
     if (state.disposed) {
-      console.debug(`Attempting to disconnect an already disposed ref:`, self)
-      return self
+      console.debug(`Attempting to disconnect an already disposed ref:`, self);
+      return self;
     }
 
-    untrack(self)
+    untrack(self);
 
-    ObjectRefs.delete(id)
+    ObjectRefs.delete(id);
 
-    const source = target.deref()
+    const source = target.deref();
 
-    state.observed = false
-    state.disposed = true
+    state.observed = false;
+    state.disposed = true;
 
     if (source) {
-      ObjectSources.delete(source)
-      emit(MLO_OBJECT_DISPOSED_EVENT, self)
+      ObjectSources.delete(source);
+      emit(MLO_OBJECT_DISPOSED_EVENT, self);
     } else {
-      state.collected = true
-      state.collectedAt = Date.now()
-      emit(MLO_OBJECT_COLLECTED_EVENT, self)
+      state.collected = true;
+      state.collectedAt = Date.now();
+      emit(MLO_OBJECT_COLLECTED_EVENT, self);
     }
 
-    return self
+    return self;
   }
 }
 
@@ -260,7 +251,7 @@ function ResolveObjectInfo(source: object, ref: WeakRef<object>) {
         extends: [],
       }),
       detached: writable(false),
-    }
+    };
   }
   if (typeof source === 'function') {
     return {
@@ -272,7 +263,7 @@ function ResolveObjectInfo(source: object, ref: WeakRef<object>) {
         extends: [],
       }),
       detached: writable(false),
-    }
+    };
   }
 
   if (inBrowser && source instanceof Element) {
@@ -285,10 +276,10 @@ function ResolveObjectInfo(source: object, ref: WeakRef<object>) {
         extends: ['Element'],
       }),
       detached: getter(() => (ref.deref() as Element)?.isConnected ?? false),
-    }
+    };
   }
 
-  const [className, prototype] = analyzePrototype(source)
+  const [className, prototype] = analyzePrototype(source);
 
   return {
     name: writable('unknown'),
@@ -296,5 +287,5 @@ function ResolveObjectInfo(source: object, ref: WeakRef<object>) {
     category: writable('object'),
     meta: readonly({ className, extends: prototype }),
     detached: writable(false),
-  }
+  };
 }

@@ -1,5 +1,6 @@
 {
   "files.associations": {
-    ".clean-publish": "json"
+    ".clean-publish": "json",
+    "*.mdc": "markdown"
   }
 }

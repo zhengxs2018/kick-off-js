@@ -1,0 +1,36 @@
+---
+description: 标准 API 强制首选（含 ES2025 提案阶段）与 Proxy/Reflect 使用界限，禁止第三方替代与本地 shim
+alwaysApply: true
+enabled: true
+---
+
+# 标准 API 强制首选
+
+- 优先使用浏览器/Node 原生 API，禁止引入第三方替代方案实现同等语义。
+- 允许并优先使用 ES2025 及已进入提案（stage 3+）的标准 API（如 `Map.getOrInsertComputed`、`Promise.withResolvers`、`Array.prototype.toSorted`、`Iterator helpers`）；若 TypeScript lib 暂未收录某 API，使用 `lib` 升级或局部类型声明，禁止自行实现语义等价的函数或编写本地 shim。
+- 实现以语言/平台标准 API 为首选，避免手写等价逻辑；同等语义下选择代码更少、运行时开销更低的标准写法。
+
+以下为标准 API 强制首选清单（用途列对应 API 必选，禁止替代列禁止）：
+
+| API | 用途 | 禁止替代 |
+| :-- | :-- | :-- |
+| `crypto.randomUUID()` | 请求 ID | uuid, nanoid, Math.random |
+| `Promise.withResolvers()` | Deferred Promise | new Promise 闭包 |
+| `Map.getOrInsertComputed()` | 原子化惰性初始化 | has→get→set 分支 |
+| `Map.getOrInsert()` | 默认值注入 | ??=, 手动 has 检查 |
+| `DOMException` | 统一错误语义 | 自定义 Error 子类 |
+| `AbortSignal.timeout()` | 超时控制 | setTimeout + clearTimeout |
+| `AbortSignal.any()` | 多信号合并 | 手动监听多个 signal |
+| `Symbol.unscopables` | Proxy 安全边界 | 属性名约定 |
+| `Object.create(null)` | 纯净字典 | {}, Object.assign |
+| `structuredClone()` | 深拷贝 / Transferable | JSON.parse(JSON.stringify) |
+| `ReadableStream` | 流式传输 | 自定义 chunk 协议 |
+| `performance.now()` | 高精度时间戳 | Date.now() |
+| `Object.hasOwn()` | 安全属性检查 | hasOwnProperty.call |
+| `Array.prototype.toSorted()` | 无副作用排序 | sort() 原地修改 |
+
+# Proxy / Reflect 约束
+
+- `Proxy` trap 内部必须 `return Reflect.*`（如 `Reflect.get/set/has/deleteProperty`），以保留 `receiver` 透传与标准协议语义；禁止在 trap 内直接 `return obj[key]` 或 `return undefined` 绕过默认行为。
+- 普通对象属性访问保持 `obj[key]` / `obj.prop`，禁止用 `Reflect.get` 替代（二者 V8 路径相同、无性能收益）。
+- `Reflect` 仅在需要 `receiver` 透传、可组合 trap 或 `Proxy` 场景使用，禁止作为通用属性访问替换。

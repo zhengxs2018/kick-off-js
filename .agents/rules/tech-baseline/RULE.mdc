@@ -1,0 +1,13 @@
+---
+description: 仓库强制技术基线：目标运行时版本、ESM 限制、环境兼容红线、lint 工具与版本策略
+alwaysApply: true
+enabled: true
+---
+
+# 强制技术基线
+
+- 目标基线固定为 ES2025 / Node >= 24 / Chrome >= 109，TypeScript >= 7，仅 ESM（禁止 CommonJS）。
+- 禁止兼容 ES2024 及以下旧环境；库内部不得提供任何 polyfill / shim，不得处理旧版浏览器兼容；兼容性降级由消费方构建工具链负责。
+- lint 工具固定为 oxlint（非 ESLint）；oxlint 不识别 `import-x/exports-last` 等 ESLint 插件规则，`eslint-disable` 等 ESLint 指令在本仓库属无效死注释，禁止出现。
+- 库内部禁止实现 timeout，统一由调用方的 `AbortSignal.timeout()` 控制（零 Timeout）。
+- 禁止对软件和文档进行版本自增；保持原版本输出，不得出现"最终版""修复版"等字样。
