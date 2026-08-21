@@ -1,27 +1,27 @@
-import type { MloSnapshot } from "./snapshot.js"
+import type { MloSnapshot } from './snapshot.js';
 
 export interface MloMessageBase {
-  schema: string
-  id: number
-  type: string
-  data: unknown
+  schema: string;
+  id: number;
+  type: string;
+  data: unknown;
 }
 
 export interface MloSnapshotMessage extends MloMessageBase {
-  type: 'snapshot'
-  data: MloSnapshot
+  type: 'snapshot';
+  data: MloSnapshot;
 }
 
 export interface MloCallMessage extends MloMessageBase {
-  type: 'call'
+  type: 'call';
   data: {
-    method: string
-    args: unknown[]
-  }
+    method: string;
+    args: unknown[];
+  };
 }
 
-export type MloMessage = MloSnapshotMessage | MloCallMessage
+export type MloMessage = MloSnapshotMessage | MloCallMessage;
 
 export interface MloMessageEvent extends MessageEvent {
-  data: MloMessage
+  data: MloMessage;
 }

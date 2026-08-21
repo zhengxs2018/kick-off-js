@@ -2,12 +2,12 @@
   "name": "@zhengxs/tsconfig",
   "version": "0.1.0",
   "description": "zhengxs - tsconfig",
-  "author": "zhengxs2018",
   "license": "MIT",
-  "sideEffects": false,
+  "author": "zhengxs2018",
   "files": [
     "base.json",
     "dom.json",
     "lib.json"
-  ]
+  ],
+  "sideEffects": false
 }

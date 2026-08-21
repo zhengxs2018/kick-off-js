@@ -1,27 +1,35 @@
-import { mlo, promises, eventTarget, domTree, snapshot, createMloMessage, NativeSetInterval } from '@zhengxs/mlo'
+import {
+  mlo,
+  promises,
+  eventTarget,
+  domTree,
+  snapshot,
+  createMloMessage,
+  NativeSetInterval,
+} from '@zhengxs/mlo';
 
-mlo.use(promises)
-mlo.use(eventTarget)
+mlo.use(promises);
+mlo.use(eventTarget);
 mlo.use(domTree, {
   scan: true,
   monitor: true,
-})
+});
 
-let target: Window | null = null
+let target: Window | null = null;
 
-sendMessage()
-NativeSetInterval(sendMessage, 2000)
+sendMessage();
+NativeSetInterval(sendMessage, 2000);
 
 function sendMessage() {
-  GetOrCreateTarget().postMessage(createMloMessage('snapshot', snapshot()), location.origin)
+  GetOrCreateTarget().postMessage(createMloMessage('snapshot', snapshot()), location.origin);
 }
 
 function GetOrCreateTarget(): Window {
   if (target && !target.closed) {
-    return target
+    return target;
   }
 
-  target = window.open('./ui/index.html', 'ui', 'width=960,height=680')
+  target = window.open('./ui/index.html', 'ui', 'width=960,height=680');
 
-  return target!
+  return target!;
 }

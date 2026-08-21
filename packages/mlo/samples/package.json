@@ -1,9 +1,9 @@
 {
   "name": "mlo-samples",
-  "private": true,
   "version": "0.1.3",
-  "author": "zhengxs2018",
+  "private": true,
   "license": "MIT",
+  "author": "zhengxs2018",
   "type": "module",
   "scripts": {
     "dev": "vite",

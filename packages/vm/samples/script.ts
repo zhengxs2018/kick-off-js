@@ -1,5 +1,5 @@
-import './polyfill.js'
-import { Script, createContext } from '../src/index.js'
+import './polyfill.js';
+import { Script, createContext } from '../src/index.js';
 
 const code = `
 const msg = 'hello,script'
@@ -8,14 +8,14 @@ window.print = function () {
   console.log('环境变量', process.env.NODE_ENV)
   console.log('全局变量', abc)
   console.log('当前上下文变量', msg)
-}`
+}`;
 
 const vm = new Script(code, {
   scopes: ['process', 'abc'],
-})
+});
 
 const context = createContext<{
-  print: () => void
+  print: () => void;
 }>({
   process: {
     env: {
@@ -23,11 +23,11 @@ const context = createContext<{
     },
   },
   abc: '123',
-})
+});
 
-vm.runInContext(context)
+vm.runInContext(context);
 
-context.print()
+context.print();
 //=> Prints:
 //=> 环境变量 development
 //=> 全局变量 123

@@ -1,11 +1,11 @@
-import { EventSourceParserStream } from 'eventsource-parser/stream'
+import { EventSourceParserStream } from 'eventsource-parser/stream';
 
-import { createFetch } from '../src/index.js'
+import { createFetch } from '../src/index.js';
 
-const { setBaseURL, setToken, request } = createFetch()
+const { setBaseURL, setToken, request } = createFetch();
 
-setBaseURL('	https://open.bigmodel.cn')
-setToken('you apikey')
+setBaseURL('	https://open.bigmodel.cn');
+setToken('you apikey');
 
 const { data } = await request({
   url: '/api/paas/v4/chat/completions',
@@ -16,12 +16,10 @@ const { data } = await request({
     stream: true,
     messages: [{ role: 'user', content: '你好' }],
   },
-})
+});
 
-const stream = data
-  .pipeThrough(new TextDecoderStream())
-  .pipeThrough(new EventSourceParserStream())
+const stream = data.pipeThrough(new TextDecoderStream()).pipeThrough(new EventSourceParserStream());
 
 for await (const { data } of stream) {
-  console.log(data)
+  console.log(data);
 }

@@ -5,20 +5,20 @@
 ## 使用
 
 ```ts
-import { runInNewContext } from '@zhengxs/vm'
+import { runInNewContext } from '@zhengxs/vm';
 
-window.globalVar = 3
+window.globalVar = 3;
 
 const context = {
   globalVar: 1,
-}
+};
 
-runInNewContext('globalVar *= 2', context)
+runInNewContext('globalVar *= 2', context);
 
-console.log(context)
+console.log(context);
 // Prints: { globalVar: 2 }
 
-console.log(window.globalVar)
+console.log(window.globalVar);
 // Prints: 3
 ```
 

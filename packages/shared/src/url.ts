@@ -23,7 +23,7 @@
  * ```
  */
 export function addLeadingSlash(path: string): string {
-  return path.startsWith('/') ? path : `/${path}`
+  return path.startsWith('/') ? path : `/${path}`;
 }
 
 /**
@@ -50,7 +50,7 @@ export function addLeadingSlash(path: string): string {
  * ```
  */
 export function addEndingSlash(path: string): string {
-  return path.endsWith('/') ? path : `${path}/`
+  return path.endsWith('/') ? path : `${path}/`;
 }
 
 /**
@@ -68,7 +68,7 @@ export function addEndingSlash(path: string): string {
  * // => "/base"
  * ```
  */
-export const removeEndingSlash = (str: string): string => str.replace(/\/$/, '')
+export const removeEndingSlash = (str: string): string => str.replace(/\/$/, '');
 
 /**
  * 移除开头斜线
@@ -85,8 +85,7 @@ export const removeEndingSlash = (str: string): string => str.replace(/\/$/, '')
  * // => "base/"
  * ```
  */
-export const removeLeadingSlash = (str: string): string =>
-  str.replace(/^\//, '')
+export const removeLeadingSlash = (str: string): string => str.replace(/^\//, '');
 
 /**
  * 判断是否为 http 链接
@@ -101,35 +100,34 @@ export const removeLeadingSlash = (str: string): string =>
  * isHttpLink('//github.com') // => true
  * ```
  */
-export const isHttpLink = (link: string): boolean =>
-  /^(https?:)?\/\//.test(link)
+export const isHttpLink = (link: string): boolean => /^(https?:)?\/\//.test(link);
 
 export function buildURL(base: string, path: string) {
   return isHttpLink(path) || !base
     ? path
-    : `${removeEndingSlash(base)}/${removeLeadingSlash(path)}`
+    : `${removeEndingSlash(base)}/${removeLeadingSlash(path)}`;
 }
 
 export function combinedURL(
   base: string,
   path: string,
-  params?: string[][] | Record<string, string> | string | URLSearchParams
+  params?: string[][] | Record<string, string> | string | URLSearchParams,
 ) {
-  let url = buildURL(base, path)
+  let url = buildURL(base, path);
 
-  if (!params) return url
+  if (!params) return url;
 
-  const target = new URL(url)
+  const target = new URL(url);
 
-  const { searchParams } = target
+  const { searchParams } = target;
 
   new URLSearchParams(params).forEach((value, key) => {
     if (searchParams.has(key)) {
-      searchParams.append(key, value)
+      searchParams.append(key, value);
     } else {
-      searchParams.set(key, value)
+      searchParams.set(key, value);
     }
-  })
+  });
 
-  return target.toString()
+  return target.toString();
 }

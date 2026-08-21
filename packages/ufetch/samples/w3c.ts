@@ -1,8 +1,8 @@
-import { createFetch } from '../src/index.js'
+import { createFetch } from '../src/index.js';
 
-const { setBaseURL, request } = createFetch()
+const { setBaseURL, request } = createFetch();
 
-setBaseURL('https://www.baidu.com')
+setBaseURL('https://www.baidu.com');
 
 const { data } = await request({
   url: '/su',
@@ -10,6 +10,6 @@ const { data } = await request({
     wd: 'wq',
     action: 'opensearch',
   },
-})
+});
 
-console.log('data', typeof data, data)
+console.log('data', typeof data, data);

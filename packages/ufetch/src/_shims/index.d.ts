@@ -5,7 +5,7 @@ import {
   TransformStream,
   TextDecoderStream,
   TextEncoderStream,
-} from './registry.js'
+} from './registry.js';
 
 export {
   TextDecoder,
@@ -14,4 +14,4 @@ export {
   TransformStream,
   TextDecoderStream,
   TextEncoderStream,
-}
+};

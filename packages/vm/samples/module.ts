@@ -1,11 +1,11 @@
-import { isNil } from '@zhengxs/shared'
+import { isNil } from '@zhengxs/shared';
 
-import './polyfill.js'
-import { ModuleScript } from '../src/index.js'
+import './polyfill.js';
+import { ModuleScript } from '../src/index.js';
 
 type Extension = {
-  activate: () => void
-}
+  activate: () => void;
+};
 
 const code = `
 const { isNil } = require('@zhengxs/shared')
@@ -18,7 +18,7 @@ exports.activate = function () {
   console.log('全局变量', abc)
   console.log('函数调用', isNil(null), isNil(1))
   console.log('当前上下文变量', msg)
-}`
+}`;
 
 const vm = new ModuleScript<Extension>(code, {
   env: {
@@ -30,13 +30,13 @@ const vm = new ModuleScript<Extension>(code, {
     },
   },
   scopes: ['abc'],
-})
+});
 
 const exports = vm.getExports({
   abc: '123',
-})
+});
 
-exports.activate()
+exports.activate();
 //=> Prints:
 //=> 环境变量 development
 //=> 全局变量 123
