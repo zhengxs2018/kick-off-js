@@ -1,21 +1,17 @@
-import type { MloObject } from '@zhengxs/mlo'
-import React from 'react'
-import { Terminal, Box, Cpu } from 'lucide-react'
+import type { MloObject } from '@zhengxs/mlo';
+import React from 'react';
+import { Terminal, Box, Cpu } from 'lucide-react';
 
-import { MloBadge } from './MloBadge.js'
-import { formatTime } from '@/lib/utils'
+import { MloBadge } from './MloBadge.js';
+import { formatTime } from '@/lib/utils';
 
 export type MloObjectRowProps = {
-  item: MloObject
-  onLink(links: number[], title: string): void
-  onLog(item: MloObject): void
-}
+  item: MloObject;
+  onLink(links: number[], title: string): void;
+  onLog(item: MloObject): void;
+};
 
-export const MloObjectRow: React.FC<MloObjectRowProps> = ({
-  item,
-  onLink,
-  onLog,
-}) => {
+export const MloObjectRow: React.FC<MloObjectRowProps> = ({ item, onLink, onLog }) => {
   // Determine status badge
   const statusBadge = item.detached ? (
     <MloBadge variant="destructive">Detached</MloBadge>
@@ -23,12 +19,12 @@ export const MloObjectRow: React.FC<MloObjectRowProps> = ({
     <MloBadge variant="secondary">Disposed</MloBadge>
   ) : (
     <MloBadge variant="success">Normal</MloBadge>
-  )
+  );
 
   // Handle Links Display (+N logic)
-  const maxVisibleLinks = 3
-  const visibleLinks = item.links.slice(0, maxVisibleLinks)
-  const remainingLinks = item.links.length - maxVisibleLinks
+  const maxVisibleLinks = 3;
+  const visibleLinks = item.links.slice(0, maxVisibleLinks);
+  const remainingLinks = item.links.length - maxVisibleLinks;
 
   return (
     <tr className="group border-b border-zinc-100 last:border-0 hover:bg-zinc-50/80 transition-colors">
@@ -43,11 +39,7 @@ export const MloObjectRow: React.FC<MloObjectRowProps> = ({
       <td className="py-3">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
-            {item.category === 'element' ? (
-              <Box size={16} />
-            ) : (
-              <Cpu size={16} />
-            )}
+            {item.category === 'element' ? <Box size={16} /> : <Cpu size={16} />}
           </div>
           <div>
             <div className="font-medium text-zinc-900">{item.name}</div>
@@ -61,12 +53,10 @@ export const MloObjectRow: React.FC<MloObjectRowProps> = ({
         </MloBadge>
       </td>
       <td className="py-3">{statusBadge}</td>
-      <td className="py-3 text-xs text-zinc-500 font-mono">
-        {formatTime(item.createdAt)}
-      </td>
+      <td className="py-3 text-xs text-zinc-500 font-mono">{formatTime(item.createdAt)}</td>
       <td className="py-3">
         <div className="flex items-center gap-1">
-          {visibleLinks.map((linkId) => (
+          {visibleLinks.map(linkId => (
             <button
               key={linkId}
               onClick={() => onLink([linkId], `Link #${linkId}`)}
@@ -77,9 +67,7 @@ export const MloObjectRow: React.FC<MloObjectRowProps> = ({
           ))}
           {remainingLinks > 0 && (
             <button
-              onClick={() =>
-                onLink(item.links, `All Links for #${item.id}`)
-              }
+              onClick={() => onLink(item.links, `All Links for #${item.id}`)}
               className="flex h-6 items-center rounded bg-zinc-100 px-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-200"
             >
               +{remainingLinks}
@@ -97,5 +85,5 @@ export const MloObjectRow: React.FC<MloObjectRowProps> = ({
         </button>
       </td>
     </tr>
-  )
-}
+  );
+};

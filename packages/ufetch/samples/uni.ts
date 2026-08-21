@@ -1,9 +1,9 @@
-import './uni-polyfill.js'
-import { createUniFetch } from '../src/main/main.uni.js'
+import './uni-polyfill.js';
+import { createUniFetch } from '../src/main/main.uni.js';
 
-const { setBaseURL, request } = createUniFetch()
+const { setBaseURL, request } = createUniFetch();
 
-setBaseURL('https://www.baidu.com')
+setBaseURL('https://www.baidu.com');
 
 const { data } = await request({
   url: '/su',
@@ -11,6 +11,6 @@ const { data } = await request({
     wd: 'wq',
     action: 'opensearch',
   },
-})
+});
 
-console.log('data', typeof data, data)
+console.log('data', typeof data, data);

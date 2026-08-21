@@ -1,4 +1,4 @@
-import { createEmitter } from '../common/events.js'
+import { createEmitter } from '../common/events.js';
 
 /**
  * 事件系统
@@ -6,4 +6,4 @@ import { createEmitter } from '../common/events.js'
  * @internal
  * @deprecated 内部API，请勿在外部使用
  */
-export const emitter = createEmitter()
+export const emitter = createEmitter();

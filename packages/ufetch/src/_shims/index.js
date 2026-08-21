@@ -7,10 +7,10 @@ import {
   TransformStream,
   TextDecoderStream,
   TextEncoderStream,
-} from './registry.js'
+} from './registry.js';
 
 if (!kind) {
-  setShims(globalThis, { auto: true })
+  setShims(globalThis, { auto: true });
 }
 
 export {
@@ -20,4 +20,4 @@ export {
   TransformStream,
   TextDecoderStream,
   TextEncoderStream,
-}
+};

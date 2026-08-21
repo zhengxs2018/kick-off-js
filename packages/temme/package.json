@@ -1,0 +1,79 @@
+{
+  "name": "@zhengxs/temme",
+  "version": "0.1.0",
+  "description": "HTML extraction DSL rewritten on a POJO execution plan with a linkedom default adapter.",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    "./compiler": "./src/compiler/index.ts",
+    "./compiler/*": "./src/compiler/*",
+    "./runtime": "./src/runtime/index.ts",
+    "./runtime/*": "./src/runtime/*",
+    "./schema": "./src/schema.ts",
+    ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      "./package.json": "./package.json",
+      "./compiler": {
+        "import": "./dist/compiler/index.js",
+        "types": "./dist/compiler/index.d.ts"
+      },
+      "./compiler/*": {
+        "import": "./dist/compiler/*",
+        "types": "./dist/compiler/*"
+      },
+      "./runtime": {
+        "import": "./dist/runtime/index.js",
+        "types": "./dist/runtime/index.d.ts"
+      },
+      "./runtime/*": {
+        "import": "./dist/runtime/*",
+        "types": "./dist/runtime/*"
+      },
+      "./schema": {
+        "import": "./dist/schema.js",
+        "types": "./dist/schema.d.ts"
+      },
+      ".": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      }
+    }
+  },
+  "scripts": {
+    "preinstall": "bun run build.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage --coverage-reporter=text --coverage-reporter=lcov --coverage-dir=coverage --reporter=junit --reporter-outfile=coverage/junit.xml",
+    "bench": "bun run bench/extractor.bench.ts"
+  },
+  "dependencies": {
+    "linkedom": "^0.18.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^30.0.0",
+    "jsdom": "^30.0.1",
+    "peggy": "^5.1.0"
+  },
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

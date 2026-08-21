@@ -1,22 +1,22 @@
-import { mlo, eventTarget, domTree, promises } from '@zhengxs/mlo'
+import { mlo, eventTarget, domTree, promises } from '@zhengxs/mlo';
 
-import React from 'react'
-import { createRoot } from 'react-dom/client'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 
-import './index.css'
-import App from './App.js'
-import { createMemoryLeak } from './leak.js'
+import './index.css';
+import App from './App.js';
+import { createMemoryLeak } from './leak.js';
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
-)
+  </React.StrictMode>,
+);
 
 // 避免把 react 框架监听到
 setTimeout(() => {
-  mlo.use(promises)
-  mlo.use(eventTarget)
+  mlo.use(promises);
+  mlo.use(eventTarget);
   mlo.use(domTree, {
     root: '#root',
     monitor: true,
@@ -26,7 +26,7 @@ setTimeout(() => {
       { type: 'exact', test: 'script', reason: '' },
       { type: 'exact', test: 'noscript', reason: '' },
     ],
-  })
+  });
 
-  createMemoryLeak()
-}, 0)
+  createMemoryLeak();
+}, 0);

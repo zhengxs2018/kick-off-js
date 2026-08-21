@@ -1,6 +1,6 @@
-import type { EventListener, DisposeLike } from '../common/events.js'
-import { isFunction } from '../common/utils.js'
-import { emitter } from '../internal/emitter.js'
+import type { EventListener, DisposeLike } from '../common/events.js';
+import { isFunction } from '../common/utils.js';
+import { emitter } from '../internal/emitter.js';
 
 /**
  * 创建事件监听器
@@ -12,15 +12,12 @@ import { emitter } from '../internal/emitter.js'
  */
 export function createEvent<T>(type: PropertyKey) {
   return function event(listener: EventListener<T>) {
-    return on(type, listener)
-  }
+    return on(type, listener);
+  };
 }
 
-export function on<T>(
-  type: PropertyKey,
-  listener: EventListener<T>
-): DisposeLike {
-  return emitter.on(type, listener)
+export function on<T>(type: PropertyKey, listener: EventListener<T>): DisposeLike {
+  return emitter.on(type, listener);
 }
 
 /**
@@ -32,54 +29,54 @@ export function on<T>(
  * @returns 是否成功触发事件
  */
 export function emit(type: PropertyKey, data?: unknown): boolean {
-  return emitter.emit(type, data)
+  return emitter.emit(type, data);
 }
 
 export const Disposable = {
   from(...disposables: DisposeLike[]): DisposeLike {
     return {
       dispose() {
-        disposeAll(disposables)
-        disposables.length = 0
+        disposeAll(disposables);
+        disposables.length = 0;
       },
-    }
+    };
   },
   dispose(cb: () => void): DisposeLike {
     return {
       dispose() {
         try {
-          cb()
+          cb();
         } catch (error) {
-          console.error('Error during disposal:', error)
+          console.error('Error during disposal:', error);
         }
       },
-    }
+    };
   },
   noop(): DisposeLike {
     return {
-      dispose() { },
-    }
+      dispose() {},
+    };
   },
-}
+};
 
 export function disposeAll(disposables: (DisposeLike | (() => void))[]) {
-  const errors: Error[] = []
+  const errors: Error[] = [];
 
   for (const disposable of disposables) {
     try {
       if (isFunction(disposable)) {
-        disposable()
+        disposable();
       } else {
-        disposable.dispose()
+        disposable.dispose();
       }
     } catch (error) {
-      errors.push(error instanceof Error ? error : new Error(String(error)))
+      errors.push(error instanceof Error ? error : new Error(String(error)));
     }
   }
 
   if (errors.length === 1) {
-    throw errors[0]
+    throw errors[0];
   } else if (errors.length > 1) {
-    throw new AggregateError(errors, 'Multiple errors occurred during disposal')
+    throw new AggregateError(errors, 'Multiple errors occurred during disposal');
   }
 }

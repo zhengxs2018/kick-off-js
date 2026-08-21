@@ -1,22 +1,22 @@
-import type { MloObject } from './object.js'
+import type { MloObject } from './object.js';
 
 export interface MloSnapshot {
-  stats: MloStatsItem[]
-  items: MloObject[]
-  timestamp: number
+  stats: MloStatsItem[];
+  items: MloObject[];
+  timestamp: number;
 }
 
 export type MloStatsItem = {
-  type: string
-  total: number
-  detached: number
-  details: MloStatsSubItem[]
-}
+  type: string;
+  total: number;
+  detached: number;
+  details: MloStatsSubItem[];
+};
 
 export type MloStatsSubItem = {
-  label: string
-  count: number
-  detached: number
-}
+  label: string;
+  count: number;
+  detached: number;
+};
 
-export type MloStats = Record<string, MloStatsItem>
+export type MloStats = Record<string, MloStatsItem>;

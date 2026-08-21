@@ -15,18 +15,18 @@ $ open http://localhost:8080/
 ## 使用
 
 ```ts
-import { createApp } from '@zhengxs/bottle'
+import { createApp } from '@zhengxs/bottle';
 
-const app = createApp()
+const app = createApp();
 
 app.use(function () {
-  ctx.statusCode = 200
-  ctx.body = 'hello,world'
-})
+  ctx.statusCode = 200;
+  ctx.body = 'hello,world';
+});
 
 app.listen(3000, function () {
-  console.log('Server is running on http://localhost:3000')
-})
+  console.log('Server is running on http://localhost:3000');
+});
 ```
 
 ## License

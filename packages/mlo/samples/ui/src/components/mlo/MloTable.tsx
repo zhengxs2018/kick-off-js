@@ -1,35 +1,30 @@
-import type { MloObject } from '@zhengxs/mlo'
-import React, { useMemo, useState } from 'react'
-import { Filter, ChevronRight, ChevronLeft } from 'lucide-react'
+import type { MloObject } from '@zhengxs/mlo';
+import React, { useMemo, useState } from 'react';
+import { Filter, ChevronRight, ChevronLeft } from 'lucide-react';
 
-import { MloObjectRow } from './MloObjectRow.js'
+import { MloObjectRow } from './MloObjectRow.js';
 
 export type MloTableProps = {
-  data: MloObject[]
+  data: MloObject[];
 
   pagination?: {
-    page?: number
-    pageSize?: number
-  }
+    page?: number;
+    pageSize?: number;
+  };
 
-  onLink(links: number[], title: string): void
-  onLog(item: MloObject): void
-}
+  onLink(links: number[], title: string): void;
+  onLog(item: MloObject): void;
+};
 
-export const MloTable: React.FC<MloTableProps> = ({
-  data,
-  pagination,
-  onLink,
-  onLog,
-}) => {
-  const [current, setCurrentPage] = useState<number>(pagination?.page || 1)
-  const [pageSize] = useState<number>(pagination?.page || 10)
+export const MloTable: React.FC<MloTableProps> = ({ data, pagination, onLink, onLog }) => {
+  const [current, setCurrentPage] = useState<number>(pagination?.page || 1);
+  const [pageSize] = useState<number>(pagination?.page || 10);
 
-  const totalPages = Math.ceil(data.length / pageSize)
+  const totalPages = Math.ceil(data.length / pageSize);
 
   const paginatedItems = useMemo(() => {
-    return data.slice((current - 1) * pageSize, current * pageSize)
-  }, [data, current, pageSize])
+    return data.slice((current - 1) * pageSize, current * pageSize);
+  }, [data, current, pageSize]);
 
   return (
     <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
@@ -48,13 +43,8 @@ export const MloTable: React.FC<MloTableProps> = ({
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {paginatedItems.length > 0 ? (
-              paginatedItems.map((item) => (
-                <MloObjectRow
-                  key={item.id}
-                  item={item}
-                  onLink={onLink}
-                  onLog={onLog}
-                />
+              paginatedItems.map(item => (
+                <MloObjectRow key={item.id} item={item} onLink={onLink} onLog={onLog} />
               ))
             ) : (
               <tr>
@@ -73,15 +63,11 @@ export const MloTable: React.FC<MloTableProps> = ({
       {/* Pagination */}
       <div className="flex items-center justify-between border-t border-zinc-100 px-6 py-4">
         <p className="text-sm text-zinc-500">
-          Showing{' '}
-          <span className="font-medium text-zinc-900">
-            {data.length}
-          </span>{' '}
-          results
+          Showing <span className="font-medium text-zinc-900">{data.length}</span> results
         </p>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={pagination?.page === 1}
             className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -91,7 +77,7 @@ export const MloTable: React.FC<MloTableProps> = ({
             Page {current} of {totalPages || 1}
           </span>
           <button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={current === totalPages || totalPages === 0}
             className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -100,5 +86,5 @@ export const MloTable: React.FC<MloTableProps> = ({
         </div>
       </div>
     </section>
-  )
-}
+  );
+};

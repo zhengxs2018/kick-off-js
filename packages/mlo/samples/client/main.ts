@@ -1,2 +1,2 @@
-import './mlo.js'
-import './leak.js'
+import './mlo.js';
+import './leak.js';

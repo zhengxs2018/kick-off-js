@@ -13,8 +13,8 @@ $ pnpm add @zhengxs/ufetch
 ### 使用
 
 ```ts
-import { request } from '@zhengxs/ufetch'
-import { EventSourceParserStream } from 'eventsource-parser/stream'
+import { request } from '@zhengxs/ufetch';
+import { EventSourceParserStream } from 'eventsource-parser/stream';
 
 const { data } = await request({
   url: 'https://<your base url>/chat/completions',
@@ -30,14 +30,12 @@ const { data } = await request({
     stream: true,
     messages: [{ role: 'user', content: 'hi' }],
   },
-})
+});
 
-const stream = data
-  .pipeThrough(new TextDecoderStream())
-  .pipeThrough(new EventSourceParserStream())
+const stream = data.pipeThrough(new TextDecoderStream()).pipeThrough(new EventSourceParserStream());
 
 for await (const event of stream) {
-  console.log('event', event)
+  console.log('event', event);
 }
 ```
 
@@ -52,42 +50,42 @@ pnpm add web-streams-polyfill text-decoding eventsource-parser
 解决微信小程序中不存在 `TransformStream` 的问题。
 
 ```js
-import { TransformStream } from '@zhengxs/ufetch/shims'
-import { createParser } from 'eventsource-parser'
+import { TransformStream } from '@zhengxs/ufetch/shims';
+import { createParser } from 'eventsource-parser';
 
 export function EventSourceParserStream({ onError, onRetry, onComment } = {}) {
-  let parser
+  let parser;
 
   return new TransformStream({
     start(controller) {
       parser = createParser({
-        onEvent: (event) => {
-          controller.enqueue(event)
+        onEvent: event => {
+          controller.enqueue(event);
         },
         onError(error) {
           if (onError === 'terminate') {
-            controller.error(error)
+            controller.error(error);
           } else if (typeof onError === 'function') {
-            onError(error)
+            onError(error);
           }
         },
         onRetry,
         onComment,
-      })
+      });
     },
     transform(chunk) {
-      parser.feed(chunk)
+      parser.feed(chunk);
     },
-  })
+  });
 }
 ```
 
 从 `@zhengxs/ufetch/uni` 中导出请求方法和 `TextDecoderStream` 对象。
 
 ```ts
-import '@zhengxs/ufetch/shims/uni' // 必须在最顶部
-import { TextDecoderStream } from '@zhengxs/ufetch/shims'
-import { request } from '@zhengxs/ufetch/uni'
+import '@zhengxs/ufetch/shims/uni'; // 必须在最顶部
+import { TextDecoderStream } from '@zhengxs/ufetch/shims';
+import { request } from '@zhengxs/ufetch/uni';
 
 const { data } = await request({
   url: 'https://<your base url>/chat/completions',
@@ -103,14 +101,12 @@ const { data } = await request({
     stream: true,
     messages: [{ role: 'user', content: 'hi' }],
   },
-})
+});
 
-const stream = data
-  .pipeThrough(new TextDecoderStream())
-  .pipeThrough(new EventSourceParserStream())
+const stream = data.pipeThrough(new TextDecoderStream()).pipeThrough(new EventSourceParserStream());
 
 for await (const event of stream) {
-  console.log('event', event)
+  console.log('event', event);
 }
 ```
 

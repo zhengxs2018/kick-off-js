@@ -1,13 +1,10 @@
-import { setShims } from './registry.js'
+import { setShims } from './registry.js';
 
 // #ifdef MP-WEIXIN
-import { ReadableStream, TransformStream } from 'web-streams-polyfill'
-import { TextDecoder, TextEncoder } from 'text-decoding'
+import { ReadableStream, TransformStream } from 'web-streams-polyfill';
+import { TextDecoder, TextEncoder } from 'text-decoding';
 
-import {
-  TextDecoderStream,
-  TextEncoderStream,
-} from '../_polyfills/text-encode-transform.js'
+import { TextDecoderStream, TextEncoderStream } from '../_polyfills/text-encode-transform.js';
 
 setShims(
   {
@@ -20,6 +17,6 @@ setShims(
   },
   {
     kind: 'weixin',
-  }
-)
+  },
+);
 // #endif

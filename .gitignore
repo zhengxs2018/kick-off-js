@@ -3,6 +3,12 @@
 
 node_modules
 
+.codex
+.codebuddy
+.workbuddy
+.cursor
+.claude
+
 # git features
 .mailmap
 
@@ -25,11 +31,13 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+.turbo
+.output
+
 # build artifacts
 dist/
 dist-types/
 package/
-.turbo
 
 yarn.lock
 pnpm-lock.yaml

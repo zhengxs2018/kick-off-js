@@ -10,7 +10,7 @@ export function readonly<T>(value: T): PropertyDescriptor {
     writable: false,
     enumerable: true,
     configurable: false,
-  }
+  };
 }
 
 /**
@@ -25,7 +25,7 @@ export function writable<T>(value: T): PropertyDescriptor {
     writable: true,
     enumerable: true,
     configurable: false,
-  }
+  };
 }
 
 /**
@@ -40,7 +40,7 @@ export function constant<T>(value: T): PropertyDescriptor {
     writable: false,
     enumerable: false,
     configurable: false,
-  }
+  };
 }
 
 /**
@@ -54,5 +54,5 @@ export function getter<T>(getter: () => T): PropertyDescriptor {
     get: getter,
     enumerable: true,
     configurable: false,
-  }
+  };
 }

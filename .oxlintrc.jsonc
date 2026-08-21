@@ -6,5 +6,12 @@
     "es2025": true,
   },
   "rules": {},
-  "ignorePatterns": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/tests/**",
+    "**/coverage/**",
+    "**/samples/**",
+    "**/*.js"
+  ],
 }

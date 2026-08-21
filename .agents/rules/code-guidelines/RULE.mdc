@@ -14,14 +14,44 @@ enabled: true
 - **禁止一切 lint 指令注释**：`/* eslint-disable ... */`、`/* eslint-enable ... */`、`// eslint-disable-next-line`、`@ts-*`、`@ts-expect-error`、`@ts-ignore` 等一律删除；其背后若确有真实 lint 问题，改为修复代码而非压制。
 - 行内解释性注释（`// 做什么`）、文件头块注释（`/** ... */` 文件级说明）一律删除，代码自解释。
 - 删除注释掉的死代码、修改记录/作者/日期注释、复述代码的提示性注释（如 `// 读取`、`// 循环`）。
+- 保留下来的单行 `//` 注释（如非显而易见的「为何」说明）保持原样，禁止改成多行 `/** */` 块注释。
 
 ### 公开 API 必须 TSDoc 块注释（强制）
 
 导出函数、类、接口、类型（即对外契约）**必须**用标准 TSDoc 多行块注释（`/** ... */`）标注，给人类阅读的 API 文档。内部/私有实现不强制。
 
+- 一律使用 `/** ... */` 多行**文本**形式：每行以 ` *` 起头，注释跨多行书写；禁止 `/* ... */`（双星变单星）写法，禁止把整段塞进单行 `/** 文本 */`。
+- 块注释正文与 `@param`/`@returns`/`@default` 等标签之间空一行分隔。
 - `@param` 描述用 `-` 隔开参数名与说明：`@param name - 说明`（禁止 `:` 或纯空格分隔）。
 - 非显而易见的语义约束、设计权衡用 `-` 列表写在块注释正文，与代码行为一致（文档与签名/实现冲突即违规）。
 - 必须含 `@param`（每个形参）与 `@returns`；可能抛错时含 `@throws`。
+
+```ts
+/**
+ * 不同名并发上限
+ *
+ * @default 4
+ */
+maxSpidersCount?: number;
+
+/**
+ * 启动一个实例
+ *
+ * @param name - 爬虫名称
+ */
+run(name: string): void;
+```
+
+### 公开 API 注释极简（强制）
+
+TSDoc 只写一句话概括该导出做什么；名字/属性自说明的字段不写注释；存在歧义才解释。
+
+- 禁止罗列要点（`- 每...`）、复述实现细节、空行后重复标题。
+- 若某名字或属性必须长注释才能说清，说明命名本身有问题，改为改名而非加注释。
+- `@param` 保留必要歧义说明，其余省略。
+- 名字本身已表达功能的成员（如 `dispose`、`[Symbol.dispose]`、`[Symbol.asyncDispose]`、`[Symbol.toStringTag]`）不写注释。
+- 不对类型/`type` 别名自身加注释（如 `RunState` 不加 `/** 运行记录 */`）；歧义说明写在成员字段上。
+- 通用形参名 `options` 省略 `@param`（名字已表意），函数自身的一句话 TSDoc 保留。
 
 ```ts
 /**
@@ -62,8 +92,56 @@ export function find(input: unknown, before?: string, after?: string): unknown {
 - **高性能**：避免不必要的数组拷贝与重复遍历；优先 `indexOf`/`slice` 等原生 O(n) 操作；早返回扁平化分支，禁止深层嵌套 `if`。
 - 一个函数只做一件事；实现超过约 30 行拆分；参数不超过 3 个，超出用 options 对象聚合。
 - 优先纯函数；有副作用的函数名显式表达意图（`save*`/`write*`/`update*`）。
+- **禁止 `??` 兜底**：非必要禁止使用空值合并运算符。默认值/兜底一律用显式判断 `x !== undefined ? x : fallback`；`x?.y ?? z` 改为 `x?.y !== undefined ? x.y : z`。仅在明确要吞 `null`（极少场景）时才允许，默认禁止；注释里也不得写「用 `??` 保证…」之类说明。
 
-## 二、函数与方法风格（强制）
+## 三、模块布局与代码顺序（强制）
+
+### 规则 1：模块内代码顺序固定
+
+单个模块内代码顺序固定为：**常量 → 导出函数 → 导出类型 → 内部函数 → 内部类型**。
+
+### 规则 2：内部函数写在 `return` 之后
+
+- 内部复用的子函数用 `function` 声明，定义在 `return` 语句**之后**（依赖函数声明提升，提前返回/闭包捕获外层变量均合法）。
+- 非必要不使用箭头函数：具名函数变量、`() => {}` / `async () => {}` IIFE 一律改为 `function` / `async function` 声明；仅在确需绑定 `this` 或一次性回调（如 `addEventListener`、`then` 回调、接口/类型签名中的函数类型标注 `(x: T) => void`）时才用箭头函数。
+- 对象方法简写 `stop() {}` 不是箭头属性，保留简写。
+
+### 规则 3：类型导入/导出独立成行
+
+- 导入的类型用 `import type { X } from '...'`；导出的类型用 `export type { X } from '...'`。
+- 禁止 `import { a, type B }` 或 `export { a, type B }` 混合写法。
+
+## 四、通用工具与样板消除（强制）
+
+### 规则 1：通用工具集中 `src/utils.ts`
+
+跨模块复用的纯函数（如 `isObject` / `createAbortError` / `resolveQps` / `getOrInsert`）统一放 `utils.ts`，禁止各文件私有重复定义。
+
+### 规则 2：配置兜底用解构默认值
+
+- 配置字段兜底一律用解构默认值 `const { a = 1, b = 'x' } = options`，禁止逐项 `!== undefined ? x : 默认值` 样板。
+- 必填缺失直接 `throw`，不静默默认、不静默转 `Map` 兜底。
+
+### 规则 3：懒初始化 Map 条目用 `getOrInsert`
+
+禁止 `let v = map.get(k); if (!v) { v = ...; map.set(k, v) }` 样板，改用 `getOrInsert(map, k, () => ...)`（来自 `utils.ts`）。
+
+### 规则 4：禁止无意义配置层注册
+
+禁止 `new Map` + for 循环注册（如旧 `spiders` Map + `register` 方法 + 初始化 for 循环），配置数组直接 `map` 成 handler 数组传入。
+
+### 规则 5：URL 处理统一入口
+
+- `toURL(input: string | URL): URL` 为统一入口，内部子函数全部基于 `URL` 处理（限速取 `url.hostname`、`fetch(url)`、`cacheKey(url)` 传 `URL`）。
+- `normalizeUrl(url: URL)` 收 `URL`、内部 `new URL(input)` clone 避免污染原对象。
+- 禁止 `hostOf` 这类「现转现取」垃圾函数、禁止 `cacheKey(url.href)` 之类多余 `.href` 拆分。
+
+### 规则 6：注释写给维护者，讲不变量/为什么
+
+- 删 §编号 / 项N / 第N轮 / 红线代号 / 架构文档复述（如「scheduler 在 storage 上 defineCollection」）。
+- interface 方法一行说明即可；JSDoc 不替调用方复述其他模块实现。
+
+## 五、函数与方法风格（强制）
 
 ### 规则 1：导出函数直接 `export`，禁止尾部 `export {}`
 
@@ -122,8 +200,4 @@ interface Transport {
 ```
 
 - 普通可选**数据字段**（非方法）仍可用 `field?: T`。
-- 仅方法类成员强制使用 `name?(args): R` 形式，不使用 `name?: (args) => R`。
-- **`readonly` 修饰符约束**：`readonly` 只能修饰属性声明或索引签名，不能修饰方法简写（`readonly onDisconnect?(): void` 或 `readonly onDisconnect(): void` 均编译报错）。因此：
-  - 带 `readonly` 的接口字段**保持字段形式**：`readonly postMessage: (payload: RpcRequest) => void;`（即使它是函数类型也不得改为方法简写）。
-  - 仅**不带 `readonly` 的方法成员**才适用 `?()` 简写（如 `messaging/transport.ts` 的 `onDisconnect?(): void`）。
-  - 实现对象（非接口 `readonly`）里的方法用规则 2 的简写 `method() {}`。
+- 对象/类型的方法，使用简写的 `onDisconnect?(): void` 代替 `onDisconnect?: () => void`

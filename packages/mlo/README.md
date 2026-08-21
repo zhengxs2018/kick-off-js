@@ -29,61 +29,61 @@
 ## 示例
 
 ```ts
-import { mlo, eventTarget, domTree, observers } from '@zhengxs/mlo'
+import { mlo, eventTarget, domTree, observers } from '@zhengxs/mlo';
 
-mlo.use(eventTarget)
+mlo.use(eventTarget);
 mlo.use(observers, {
   // 监控 ResizeObserver 对象
   resize: true,
   // 监控 MutationObserver 对象
   mutation: true,
-})
+});
 mlo.use(domTree, {
   // 立即递归查找一次页面中的所有可见元素
   scan: true,
   // 通过 MutationObserver 持续监控页面
   monitor: true,
-})
+});
 
-mlo.events.onObjectObserved((event) => {
-  console.log('新增观察对象: %s', event.detail)
-})
+mlo.events.onObjectObserved(event => {
+  console.log('新增观察对象: %s', event.detail);
+});
 
-mlo.events.onObjectCollected((event) => {
-  console.log('对象已被回收: %s', event.detail)
-})
+mlo.events.onObjectCollected(event => {
+  console.log('对象已被回收: %s', event.detail);
+});
 
-let obj: object | null = { foo: 'bar' }
+let obj: object | null = { foo: 'bar' };
 
 // 观察对象
-mlo.observe(obj)
+mlo.observe(obj);
 
-let func = () => void 0
+let func = () => void 0;
 
 // 观察函数
-mlo.observe(func)
+mlo.observe(func);
 
-let button = document.querySelector('#test')
+let button = document.querySelector('#test');
 
 // 观察 DOM 元素
-mlb.observe(button)
+mlb.observe(button);
 
 // 通过 eventTarget 插件自动监控
-let event: EventTarget | null = new EventTarget()
+let event: EventTarget | null = new EventTarget();
 
 event.addEventListener('test', function () {
-  console.log('Event "test" triggered')
-})
+  console.log('Event "test" triggered');
+});
 
 setInterval(() => {
-  obj = null
-  event = null
-  func = null
-  button = null
-}, 4000)
+  obj = null;
+  event = null;
+  func = null;
+  button = null;
+}, 4000);
 
 // 输出统计数据
-console.log(mlo.toJSON())
+console.log(mlo.toJSON());
 ```
 
 ## License

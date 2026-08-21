@@ -1,75 +1,75 @@
-import { inBrowser } from './env.js'
+import { inBrowser } from './env.js';
 
-const OBJ_PROTO = Object.prototype
-const ELEM_PROTO = inBrowser ? Element.prototype : null
+const OBJ_PROTO = Object.prototype;
+const ELEM_PROTO = inBrowser ? Element.prototype : null;
 
 export function isNil(o: unknown): o is null | undefined {
-  return o === null || o === undefined
+  return o === null || o === undefined;
 }
 
 export function isObject<T extends object>(o: unknown): o is T {
   if (isNil(o) || Array.isArray(o) || isFunction(o)) {
-    return false
+    return false;
   }
 
-  return typeof o === 'object'
+  return typeof o === 'object';
 }
 
 export function isFunction<T extends Function>(o: unknown): o is T {
-  return typeof o === 'function'
+  return typeof o === 'function';
 }
 
 export function isElement(o: unknown): o is Element {
-  return o instanceof Element
+  return o instanceof Element;
 }
 
 export function noop() {
-  return void 0
+  return void 0;
 }
 
 export function querySelector(
   selector?: string | Element | null,
-  parent: Element | Document = document
+  parent: Element | Document = document,
 ): Element | null {
   if (typeof selector === 'string') {
-    return parent.querySelector(selector)
+    return parent.querySelector(selector);
   }
 
   if (selector instanceof Element) {
-    return selector
+    return selector;
   }
 
-  return null
+  return null;
 }
 
 export function analyzePrototype(o: object) {
-  const chain: string[] = []
+  const chain: string[] = [];
 
-  let current: object | null = Object.getPrototypeOf(o)
+  let current: object | null = Object.getPrototypeOf(o);
 
   while (current !== null && current !== OBJ_PROTO) {
     // Note: 如果是覆盖了原始类型，通过 __mlo_class__ 来标识原始类型的类名
-    const className = (current as any).__mlo_class__
+    const className = (current as any).__mlo_class__;
 
     if (className) {
-      chain.unshift(className)
-      break
+      chain.unshift(className);
+      break;
     }
 
-    const ctor = current.constructor
-    const name = ctor?.name ?? 'Unknown'
+    const ctor = current.constructor;
+    const name = ctor?.name ?? 'Unknown';
 
-    if (name === 'Object') break
+    if (name === 'Object') break;
 
-    chain.push(name)
+    chain.push(name);
 
     if ((inBrowser && isElement(o)) || current === ELEM_PROTO) {
-      chain.push('Element')
-      break
+      chain.push('Element');
+      break;
     }
 
-    current = Object.getPrototypeOf(current)
+    current = Object.getPrototypeOf(current);
   }
 
-  return [chain[0] || 'Object', chain.slice(1)] as const
+  return [chain[0] || 'Object', chain.slice(1)] as const;
 }

@@ -1,4 +1,4 @@
-import type { MloRef } from '../../types/ref.js'
+import type { MloRef } from '../../types/ref.js';
 
 /**
  * 对象来源
@@ -6,7 +6,7 @@ import type { MloRef } from '../../types/ref.js'
  * @internal
  * @deprecated 内部API，请勿在外部使用
  */
-export const ObjectSources = new WeakMap<object, MloRef<object>>()
+export const ObjectSources = new WeakMap<object, MloRef<object>>();
 
 /**
  * 对象引用
@@ -14,4 +14,4 @@ export const ObjectSources = new WeakMap<object, MloRef<object>>()
  * @internal
  * @deprecated 内部API，请勿在外部使用
  */
-export const ObjectRefs = new Map<number, MloRef<object>>()
+export const ObjectRefs = new Map<number, MloRef<object>>();
