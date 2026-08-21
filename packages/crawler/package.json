@@ -1,0 +1,58 @@
+{
+  "name": "@zhengxs/crawler",
+  "version": "0.1.0",
+  "description": "通用爬虫引擎一体包：标准 fetch 包装器（内建礼貌限速与重试）、任务队列与并发调度；db adapter 可注入 memory/sqlite/jsonl 等实现。不耦合任何业务领域。",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    "./capabilities": "./src/capabilities/index.ts",
+    "./capabilities/*": "./src/capabilities/*",
+    "./bun": "./src/platform/bun/index.ts",
+    "./node": "./src/platform/node/index.ts",
+    ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      "./package.json": "./package.json",
+      "./capabilities": {
+        "import": "./dist/capabilities/index.js",
+        "types": "./dist/capabilities/index.d.ts"
+      },
+      "./capabilities/*": {
+        "import": "./dist/capabilities/*",
+        "types": "./dist/capabilities/*"
+      },
+      "./bun": {
+        "import": "./dist/platform/bun/index.js",
+        "types": "./dist/platform/bun/index.d.ts"
+      },
+      "./node": {
+        "import": "./dist/platform/node/index.js",
+        "types": "./dist/platform/node/index.d.ts"
+      },
+      ".": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage --coverage-reporter=text --coverage-reporter=lcov --coverage-dir=coverage --reporter=junit --reporter-outfile=coverage/junit.xml"
+  },
+  "dependencies": {},
+  "engines": {
+    "bun": ">=1.3.14",
+    "node": ">=24"
+  }
+}

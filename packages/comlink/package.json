@@ -1,0 +1,42 @@
+{
+  "name": "@zhengxs/comlink",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./web": {
+      "types": "./src/web.ts",
+      "default": "./src/web.ts"
+    }
+  },
+  "publishConfig": {
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./web": {
+        "types": "./dist/web.d.ts",
+        "default": "./dist/web.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -b -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.node.json",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "bench": "bun run ./bench/comlink.bench.ts"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}
