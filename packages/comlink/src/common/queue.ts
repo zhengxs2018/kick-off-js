@@ -18,7 +18,7 @@ export interface PendingQueue {
 export function createPendingQueue(): PendingQueue {
   const tasks = new Map<
     string,
-    { resolve: (value: unknown) => void; reject: (reason: unknown) => void }
+    { resolve: (value: any) => void; reject: (reason: unknown) => void }
   >();
 
   return { create, resolve, reject, rejectAll };

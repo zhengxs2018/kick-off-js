@@ -71,7 +71,9 @@ export type RpcEventListener = (event: RpcEvent) => void;
 export type RpcHandler<TArgs extends z.ZodTypeAny = z.ZodVoid> = (
   input: z.infer<TArgs>,
   signal: AbortSignal,
-) => unknown | Promise<unknown>;
+) => MaybePromise<unknown>;
+
+type MaybePromise<T> = T | Promise<T>;
 
 export interface RpcProcedure<TArgs extends z.ZodTypeAny = z.ZodVoid> {
   readonly name: string;

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { z } from 'zod';
 
-import { createRpcRegistry } from '../core/registry.js';
-import type { RpcProcedure } from '../core/schema.js';
+import { createRpcRegistry } from '../../src/core/registry.js';
+import type { RpcProcedure } from '../../src/core/schema.js';
 
 function makeProc(name: string): RpcProcedure {
   return { name, handler: () => undefined };

@@ -146,11 +146,11 @@ export interface RpcClientOptions {
 
   transport: RpcTransport;
 
-  onRequest(request: RpcRequest, transport: RpcTransport): void;
+  onRequest(this: void, request: RpcRequest, transport: RpcTransport): void;
 
-  onEvent?(event: RpcEvent): void;
+  onEvent?(this: void, event: RpcEvent): void;
 
-  onClose(): void;
+  onClose(this: void): void;
 }
 
 export interface RpcClient {

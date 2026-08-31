@@ -9,7 +9,7 @@ import {
   rpcEvent,
   withEventPrefix,
   RPC_EVENT_PREFIX,
-} from '../core/schema.js';
+} from '../../src/core/schema.js';
 
 describe('rpcEvent / withEventPrefix', () => {
   test('rpcEvent wraps name with prefix and params', () => {

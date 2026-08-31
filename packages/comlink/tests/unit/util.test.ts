@@ -6,7 +6,7 @@ import {
   isAbortError,
   isObject,
   unref,
-} from '../common/util.js';
+} from '../../src/common/util.js';
 
 describe('isObject', () => {
   test.each([

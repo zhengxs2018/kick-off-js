@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { RpcError } from '../core/error.js';
+import { RpcError } from '../../src/core/error.js';
 
 describe('RpcError', () => {
   test('构造后保留 code / message / data', () => {
