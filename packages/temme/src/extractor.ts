@@ -61,8 +61,8 @@ export function createExtractor<Element extends HostElement = unknown>(
 export interface ExtractOptions {
   /**
    * 列表模式输出形状：
-   * - `'columns'`（默认）：列式对象 `{ key: value[] }`，保留 drive 原生累积顺序（文档逆序）
-   * - `'rows'`：正序对象数组 `[{ key: value }]`，在结果层逆序对齐，免去业务侧补偿
+   * - `'columns'`（默认）：列式对象 `{ key: value[] }`，数组按文档正序
+   * - `'rows'`：对象数组 `[{ key: value }]`，按文档正序对齐
    */
   shape?: 'columns' | 'rows';
 }

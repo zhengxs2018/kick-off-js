@@ -51,4 +51,4 @@ for (const html of pages) {
 
 console.log('汇总记录：', JSON.stringify(allRecords, null, 2));
 // [{ id: 1, name: '麻黄' }, { id: 2, name: '桂枝' }, { id: 3, name: '黄连' }]
-// 注：数组捕获是文档逆序，本模式单页单行，按 toRecords 对齐取用。
+// 数组捕获按文档正序，本模式单页单行，按 toRecords 对齐取用。

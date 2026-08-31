@@ -20,7 +20,7 @@ node --experimental-strip-types ./01-quick-start.ts
 
 | 脚本                        | 主题          | 演示要点                                                                                               |
 | --------------------------- | ------------- | ------------------------------------------------------------------------------------------------------ |
-| `01-quick-start.ts`         | 快速上手      | 字符串规则（`parse`）+ 手写 AST 两种入口、列表数组捕获、类型注解、**数组逆序坑**                       |
+| `01-quick-start.ts`         | 快速上手      | 字符串规则（`parse`）+ 手写 AST 两种入口、列表数组捕获（文档正序）、类型注解                           |
 | `02-reuse-and-serialize.ts` | 复用 + 序列化 | `compile` + `temme(html, plan)` 复用、`serialize`/`deserialize`、`parseExecutionPlan` 校验、`manifest` |
 | `03-extensions.ts`          | 扩展点        | `createEnv` 自定义 `procedure`/`filter`、类型注解、空白策略                                            |
 | `04-crawl-pipeline.ts`      | 爬虫/ETL      | 按页驱动同一计划、产出记录数组、`toRecords` 对齐                                                       |
@@ -28,5 +28,5 @@ node --experimental-strip-types ./01-quick-start.ts
 
 ## 关键提醒
 
-- **数组捕获结果是文档逆序**：`drive` 用栈 DFS 逆序遍历匹配节点并 append。需要文档顺序时对结果 `toReversed()`。
+- **数组捕获按文档正序累积**：`drive` 按文档序正序遍历匹配节点并 append，数组捕获即为文档顺序。
 - **一切失败 fail-safe**：未注册的 filter/modifier/procedure、非法 CSS、缺属性都不会抛错，表现为"结果少字段"。排查见 `references/agent-assist.md`。

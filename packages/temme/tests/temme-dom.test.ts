@@ -70,7 +70,7 @@ const selectors: TemmeSelector[] = parse(RULE);
 const plan = compile(selectors);
 const linkedPlan = link(plan, env);
 
-const EXPECTED_TITLE = 'Python: temporarily change variable scoping rules';
+const EXPECTED_TITLE = 'Short Description of the Scoping Rules?';
 const EXPECTED_ANSWER_COUNT = 7;
 
 type Result = Record<string, unknown>;
@@ -122,8 +122,9 @@ describe('domParser 抽取结果内容', () => {
 
   it('answers 与 question 的 title 同源于真实页面', () => {
     const result = extractor.extract(document, plan) as Result;
-    expect(result.title).toContain('scoping rules');
+    expect(result.title).toContain('Scoping Rules');
     const answers = result.answers as Array<string>;
-    expect(answers[0]).toContain('up vote 5 down vote');
+    // 文档正序：第一个答案是最高赞回答
+    expect(answers[0]).toContain('up vote 259 down vote');
   });
 });

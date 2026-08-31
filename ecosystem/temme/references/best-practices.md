@@ -19,18 +19,19 @@ const rule = `
   td.price $price:number
 `;
 const result = temme(html, parse(rule));
-// { id: 3, name: '黄连', price: 9.8 }
+// { id: 1, name: '麻黄', price: 12.5 }
+// 标量捕获 First-Wins：命中多项时保留文档第一个匹配
 ```
 
-> `$name` 默认取 `text`（标量捕获，First-Wins，命中多项时后者覆盖）；`$id:int` 是类型注解；`td.id` 选择 `class="id"` 的 `td`。**`$name` 是标量捕获，不是数组捕获**——字符串里 `selector $name` 默认不累积数组。
+> `$name` 默认取 `text`（标量捕获，First-Wins，命中多项时保留第一个匹配）；`$id:int` 是类型注解；`td.id` 选择 `class="id"` 的 `td`。**`$name` 是标量捕获，不是数组捕获**——字符串里 `selector $name` 默认不累积数组。
 
 **字符串规则的数组捕获**：需用 `arrayCapture` 形态（把一组同类项累积为数组）。字符串规则写法为「数组捕获键 + 子选择器」：
 
 ```ts
 const arrayRule = 'tr $row { td.id $id; td.name $name }';
 const result = temme(html, parse(arrayRule));
-// { row: ['3黄连9.8', '2桂枝8', '1麻黄12.5'], id: '1', name: '麻黄' }
-// row 为数组（每行 text 逆序累积），id/name 为行内子选择器的标量捕获
+// { row: ['1麻黄12.5', '2桂枝8', '3黄连9.8'], id: '1', name: '麻黄' }
+// row 为数组（每行 text 按文档正序累积），id/name 为行内子选择器的标量捕获（First-Wins 取首）
 ```
 
 需要「每列独立数组」（`id:[...], name:[...]`）时，用手写 AST 的 `arrayCapture` 逐列声明（见 §1），字符串规则无法直接表达。
@@ -64,14 +65,10 @@ const result = temme(html, [
   arrayCaptureSelector('td', 'id', capture('id', { typeAnnotation: ['int'] })),
   arrayCaptureSelector('td', 'name', capture('name')),
 ]);
-// { id: [2, 1], name: ['桂枝', '麻黄'] }
+// { id: [1, 2], name: ['麻黄', '桂枝'] }
 ```
 
-### ⚠️ 坑：数组捕获结果是文档逆序
-
-验证输出为 `[2, 1]`（而非 `[1, 2]`）。原因：`drive` 用显式栈 + **逆序**遍历匹配节点并 append（见 `drive.ts`），数组累积按遍历序入桶。
-
-**处置**：若需文档顺序，对结果 `toReversed()`；或抽回**对象**后自行排序。不要依赖顺序做业务断言，除非先验证。
+> **数组捕获按文档正序累积**：`drive` 按文档序正序遍历匹配节点并 append（见 `drive.ts`），数组累积即为文档顺序。
 
 ---
 

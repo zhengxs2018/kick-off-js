@@ -17,19 +17,19 @@ const html = `
 </table>`;
 
 // 方式 A：字符串规则 + parse。
-// 注意捕获语义：`td.id $id` 是【标量】捕获（默认 text 过程，命中多项时后者覆盖），
+// 注意捕获语义：`td.id $id` 是【标量】捕获（默认 text 过程，命中多项时保留第一个匹配），
 // 需要【数组】累积时用 `arrayCapture`（见下 tr $row 写法）。
 const rule = 'td.id $id:int; td.name $name; td.price $price:number';
 const resultA = temme(html, parse(rule));
 console.log('方式A（字符串规则，标量捕获）：', JSON.stringify(resultA));
-// { "id": 3, "name": "黄连", "price": 9.8 } —— 每键只保留最后命中的一项
+// { "id": 1, "name": "麻黄", "price": 12.5 } —— 每键只保留第一个匹配
 
 // 字符串规则的【数组】捕获：整行作数组捕获（命中多项 append），子选择器作标量捕获。
 const arrayRule = 'tr $row { td.id $id:int; td.name $name }';
 const resultA2 = temme(html, parse(arrayRule));
 console.log('方式A2（字符串规则，数组捕获）：', JSON.stringify(resultA2));
-// { "row": ["3黄连9.8", "2桂枝8", "1麻黄12.5"], "id": 1, "name": "麻黄" }
-//   row 为数组（每行 text 拼接、逆序），id/name 为每个 tr 内子选择器的标量捕获（后者覆盖）
+// { "row": ["1麻黄12.5", "2桂枝8", "3黄连9.8"], "id": 1, "name": "麻黄" }
+//   row 为数组（每行 text 拼接、按文档正序），id/name 为每个 tr 内子选择器的标量捕获（取第一个）
 
 // 方式 B：手写 AST（数组捕获）。
 // 数组捕获：匹配所有 <element.className>，把 textContent 累积为数组。
@@ -55,5 +55,5 @@ const selectors: TemmeSelector[] = [
 
 const resultB = temme(html, selectors);
 console.log('方式B（手写 AST，数组捕获）：', JSON.stringify(resultB));
-// { "id": [3, 2, 1], "name": ["黄连", "桂枝", "麻黄"], "price": [9.8, 8, 12.5] }
-// 数组捕获结果是文档逆序（drive 栈 DFS 逆序遍历导致），需要文档顺序时 toReversed()。
+// { "id": [1, 2, 3], "name": ["麻黄", "桂枝", "黄连"], "price": [12.5, 8, 9.8] }
+// 数组捕获按文档正序累积（drive 按文档序正序遍历写捕获）。
