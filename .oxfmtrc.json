@@ -4,5 +4,15 @@
   "singleQuote": true,
   "arrowParens": "avoid",
   "trailingComma": "all",
-  "ignorePatterns": ["**/node_modules/**", "**/dist/**", "**/coverage/**"]
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    ".oxfmtrc.json",
+    ".oxlintrc.json",
+    "package.json",
+    "bun.lockb",
+    "tsconfig.json",
+    "tsconfig.*.json"
+  ]
 }

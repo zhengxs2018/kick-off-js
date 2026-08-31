@@ -1,5 +1,5 @@
 {
-  "name": "@zhengxs/temme",
+  "name": "@zhengxs/temme-schema",
   "version": "0.1.0",
   "description": "HTML extraction DSL rewritten on a POJO execution plan with a linkedom default adapter.",
   "author": "zhengxs2018",
@@ -12,50 +12,9 @@
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "exports": {
-    "./package.json": "./package.json",
-    "./compiler": "./src/compiler/index.ts",
-    "./compiler/*": "./src/compiler/*",
-    "./parsers": "./src/parsers/index.ts",
-    "./parsers/*": "./src/parsers/*",
-    "./runtime": "./src/runtime/index.ts",
-    "./runtime/*": "./src/runtime/*",
-    ".": "./src/index.ts"
-  },
   "publishConfig": {
     "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      "./package.json": "./package.json",
-      "./compiler": {
-        "import": "./dist/compiler/index.js",
-        "types": "./dist/compiler/index.d.ts"
-      },
-      "./compiler/*": {
-        "import": "./dist/compiler/*",
-        "types": "./dist/compiler/*"
-      },
-      "./parsers": {
-        "import": "./dist/parsers/index.js",
-        "types": "./dist/parsers/index.d.ts"
-      },
-      "./parsers/*": {
-        "import": "./dist/parsers/*",
-        "types": "./dist/parsers/*"
-      },
-      "./runtime": {
-        "import": "./dist/runtime/index.js",
-        "types": "./dist/runtime/index.d.ts"
-      },
-      "./runtime/*": {
-        "import": "./dist/runtime/*",
-        "types": "./dist/runtime/*"
-      },
-      ".": {
-        "import": "./dist/index.js",
-        "types": "./dist/index.d.ts"
-      }
-    }
+    "types": "./dist/index.d.ts"
   },
   "scripts": {
     "preinstall": "bun run build.ts",
@@ -72,6 +31,14 @@
     "clean:bundle": "rimraf dist package",
     "prepublishOnly": "bun run lint && bun run check && bun run build && clean-publish",
     "postpublish": "rimraf package"
+  },
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   },
   "dependencies": {
     "linkedom": "^0.18.0"
