@@ -12,6 +12,7 @@
     "**/tests/**",
     "**/coverage/**",
     "**/samples/**",
+    "**/bench/**",
     "**/*.js",
     ".oxfmtrc.json",
     ".oxlintrc.json",

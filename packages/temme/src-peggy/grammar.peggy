@@ -66,6 +66,12 @@
   function buildDefaultProcedure(capture) {
     return { name: DEFAULT_PROCEDURE_NAME, args: [capture] }
   }
+
+  // 定义声明工厂：filter / modifier / procedure 三规则同形，仅 type 后缀不同。
+  // peggy 5 不支持带参规则，故共享此 action 函数消除三份重复实现。
+  function buildDefine(kind, name, argsPart, code) {
+    return { type: kind + '-define', name, argsPart, code }
+  }
 }
 
 // 起始规则：整条规则文本解析为一组选择器

@@ -19,7 +19,6 @@ const input = [
 const source = peggy.generate(input.join('\n'), {
   output: 'source',
   format: 'es',
-  cache: true,
 });
 
 // peggy 产物输出到 src/compile/parse.js（运行时 parser）；
