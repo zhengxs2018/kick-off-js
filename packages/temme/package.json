@@ -1,6 +1,6 @@
 {
   "name": "@zhengxs/temme",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "HTML extraction DSL rewritten on a POJO execution plan with a linkedom default adapter.",
   "author": "zhengxs2018",
   "license": "MIT",

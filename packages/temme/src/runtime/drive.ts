@@ -43,12 +43,14 @@ export function drive<Element extends HostElement = unknown>(
       continue;
     }
 
-    // 收集为数组以逆序压栈，保证 DFS 出栈顺序与原递归一致。
-    // 注：数组捕获的累积顺序因此为文档逆序，由 `toResult(shape:'rows')` 在提取结果层修正为正序。
     const resolvedList = Array.from(engine.select(node, scope));
+    // 按文档序正序写捕获，保证数组捕获（append）累积为文档正序。
+    for (const resolved of resolvedList) {
+      writeCaptures(node, resolved);
+    }
+    // 逆序压栈子节点，配合 LIFO 出栈恢复文档正序的 DFS 遍历。
     for (let r = resolvedList.length - 1; r >= 0; r--) {
       const resolved = resolvedList[r]!;
-      writeCaptures(node, resolved);
       for (let i = node.children.length - 1; i >= 0; i--) {
         stack.push([node.children[i]!, resolved]);
       }

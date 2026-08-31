@@ -63,7 +63,7 @@ const result = temme(html, parse(rule));
 
 > 规则文本语法见 `references/dsl-reference.md`（捕获、属性捕获、类型注解、过滤器、修饰符等）。手写 AST（方式B）只在规则需程序化生成/来自远程还原时使用；要手写时，**优先**用一个辅助函数集合（见 `references/agent-assist.md` 的构造模式），而非逐个写裸对象。
 
-**捕获语义提醒**：字符串里 `td.id $id` 的 `$id` 是**标量**捕获（默认 text 过程，命中多项时后者覆盖），不是数组。需要数组累积时用 `arrayCapture`——字符串写 `tr $row { ... }` 或手写 AST 的 `arrayCapture`。详见 `references/best-practices.md` §0。
+**捕获语义提醒**：字符串里 `td.id $id` 的 `$id` 是**标量**捕获（默认 text 过程，命中多项时 First-Wins 保留第一个匹配），不是数组。需要数组累积时用 `arrayCapture`——字符串写 `tr $row { ... }` 或手写 AST 的 `arrayCapture`。详见 `references/best-practices.md` §0。
 
 ### 2. 编译 → 复用执行计划
 
@@ -103,7 +103,7 @@ extractor.execute(doc, linkedPlan); // LinkedPlan → drive（跳过 compile + l
 
 - `references/dsl-reference.md` — DSL 语法完整参考（选择器、捕获、过滤器、修饰符、过程、类型注解、snippet、父引用、赋值）。
 - `references/api-reference.md` — 顶层 API 与类型签名、子路径导出、三阶段链路（compile→link→drive）。
-- `references/best-practices.md` — 经过实际运行验证的推荐写法与踩坑教训（数组逆序、计划复用、序列化、类型清洗等）。
+- `references/best-practices.md` — 经过实际运行验证的推荐写法与踩坑教训（数组捕获、计划复用、序列化、类型清洗等）。
 - `references/extension-guide.md` — 扩展点（Env 注册表）、自定义 Adapter/Engine、schema 边界校验。
 - `references/agent-assist.md` — Agent 编写/调试/验证规则、fail-safe 语义、与爬虫/ETL 集成的辅助指南。
 

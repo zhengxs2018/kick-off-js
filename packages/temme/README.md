@@ -19,7 +19,7 @@
 - 🛠 **四段链路**：`parse` → `compile` → `link` → `drive`，每段可独立复用与替换。
 - 🧰 **类型注解**：`:number` / `:int` / `:bool` / `:text` / `:bigint`，抽取即清洗。
 - 🔌 **解析器抽象**：默认 `linkedom`，可用 `domParser` 或实现自定义 `HtmlParser` 对接宿主 DOM。
-- 🛡 **边界校验**：`@zhengxs/temme/schema` 提供 zod 校验，安全加载远程规则。
+- 🛡 **边界校验**：`serialize` / `deserialize` 序列化执行计划；远程/外部规则可在加载侧用 zod 自行校验（包内零校验）。
 
 ## 安装
 
@@ -27,13 +27,9 @@
 npm i @zhengxs/temme
 ```
 
-- 需要 `@zhengxs/temme/schema`（远程规则校验）时，另行安装可选依赖：
+- 包内不提供规则校验；如需对远程/外部 JSON 规则做边界校验，可自行安装 `zod`（可选）。
 
-```bash
-npm i zod
-```
-
-- 环境要求：Node.js ≥ 24（使用 `--experimental-strip-types` 直接运行 TS 可省去构建）。
+- 环境要求：Node.js ≥ 26.7.0（或 Bun ≥ 1.3.14，本仓库以 Bun 构建/运行）。
 
 ## 快速上手
 
@@ -56,13 +52,11 @@ const rule = `
 `;
 
 const result = temme(html, parse(rule));
-// { id: [2, 1], name: ['桂枝', '麻黄'], price: [8, 12.5] }
+// { id: 1, name: '麻黄', price: 12.5 }
 console.log(result);
 ```
 
-> ⚠️ **数组捕获结果是文档逆序**（由 `drive` 栈 DFS 逆序遍历导致）。
->
-> 需要文档顺序时对结果 `toReversed()`。
+> ℹ️ 字符串规则里 `td.id $id:int` 这类**标量捕获**（无 `{ ... }` 子块）是 First-Wins：命中多项时只保留**第一个**匹配。需要把一组同类项累积为数组时，用**数组捕获**形态（见方式 B，或字符串规则 `tr $row { ... }`）。
 
 ### 方式 B：手写 AST
 
@@ -95,13 +89,11 @@ const result = temme(html, [
   select('td', 'name', capture('name')),
 ]);
 
-// { id: [2, 1], name: ['桂枝', '麻黄'] }
+// { id: [1, 2], name: ['麻黄', '桂枝'] }
 console.log(result);
 ```
 
-> 需要文档顺序时对结果 `toReversed()`。
-
-更多可运行示例见 [`assets/examples/`](../.codebuddy/skills/temme/assets/examples/) 与下方「示例」。
+> 数组捕获（`arrayCapture`）按**文档正序**累积。
 
 ## 进阶用法
 
@@ -121,10 +113,9 @@ const data2 = temme(html2, plan);
 
 ```ts
 import { compile, serialize, deserialize } from '@zhengxs/temme';
-import { parseExecutionPlan } from '@zhengxs/temme/schema';
 
 const json = serialize(compile(selectors)); // 存库/传输
-const plan = parseExecutionPlan(deserialize(json)); // 加载侧校验
+const plan = deserialize(json); // 加载侧还原为执行计划
 ```
 
 ### 扩展能力
@@ -150,10 +141,10 @@ temme('<div class="price">¥ 12.5</div>', parse('.price $price'), { env }); // {
 | ------------ | -------------------------------------------------------------------------------------- |
 | DSL 语法参考 | 字符串规则语法与 AST 形状、捕获、过滤器、修饰符、过程、类型注解、snippet、父引用、赋值 |
 | API 参考     | 顶层 API 与类型签名、子路径导出、`parse → compile → link → drive` 链路                 |
-| 最佳实践     | 经过实际运行验证的推荐写法与踩坑教训（数组逆序、计划复用、序列化等）                   |
-| 扩展指南     | `Env` 注册表、自定义 `HtmlParser`、schema 边界校验                                     |
+| 最佳实践     | 经过实际运行验证的推荐写法与踩坑教训（数组捕获、计划复用、序列化等）                   |
+| 扩展指南     | `Env` 注册表、自定义 `HtmlParser`、远程规则加载侧校验                                  |
 
-> 完整文档（DSL 语法、API、最佳实践、扩展指南、Agent 辅助指南）同时封装为 CodeBuddy SKILL，位于仓库 `.codebuddy/skills/temme/`。
+> 完整文档（DSL 语法、API、最佳实践、扩展指南、Agent 辅助指南）同时封装为 CodeBuddy SKILL，位于仓库 `.agents/skills/temme/`。
 
 ## 架构
 

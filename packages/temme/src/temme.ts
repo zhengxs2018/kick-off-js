@@ -80,8 +80,8 @@ export interface TemmeOptions extends EnvInit {
 
   /**
    * 列表模式输出形状：
-   * - `'columns'`（默认）：列式对象 `{ key: value[] }`，保留历史行为
-   * - `'rows'`：正序对象数组 `[{ key: value }]`，免去业务侧逆序 zip
+   * - `'columns'`（默认）：列式对象 `{ key: value[] }`，数组按文档正序
+   * - `'rows'`：对象数组 `[{ key: value }]`，按文档正序对齐
    */
   shape?: 'columns' | 'rows';
 }

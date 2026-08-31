@@ -98,7 +98,7 @@ export function applyLinkedCapture(
  *
  * @param state - 源捕获状态
  * @param shape - 列表输出形状：默认 `'columns'` 返回列式对象；`'rows'` 将列式对象
- *                正序对齐为对象数组（drive 累积为文档逆序，在此逆序修正）
+ *                按文档序对齐为对象数组（drive 已按文档正序累积）
  * @returns 用户可见的捕获结果对象
  */
 export function toResult(state: CaptureState, shape: 'columns' | 'rows' = 'columns'): unknown {
@@ -124,7 +124,7 @@ function toColumns(state: CaptureState): Record<string, unknown> {
 }
 
 /**
- * 将列表模式的列式对象（各字段独立数组，drive 累积为文档逆序）转成正序行数组。
+ * 将列表模式的列式对象（各字段独立数组，drive 已按文档正序累积）转成行数组。
  *
  * @param columns - `toColumns` 产出的列式对象
  * @returns 按 DOM 顺序对齐的对象数组，缺失项补 `undefined`
@@ -133,7 +133,7 @@ function toRows(columns: Record<string, unknown>): Array<Record<string, unknown>
   const keys = Object.keys(columns);
   const arrays = keys.map(k => {
     const v = columns[k];
-    return Array.isArray(v) ? [...v].toReversed() : [v];
+    return Array.isArray(v) ? v : [v];
   });
   const len = arrays.reduce((max, arr) => Math.max(max, arr.length), 0);
   const rows: Array<Record<string, unknown>> = [];

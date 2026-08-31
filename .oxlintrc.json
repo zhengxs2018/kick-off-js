@@ -13,6 +13,7 @@
     "**/coverage/**",
     "**/samples/**",
     "**/bench/**",
+    "**/ecosystem/**/assets/**",
     "**/*.js",
     ".oxfmtrc.json",
     ".oxlintrc.json",
