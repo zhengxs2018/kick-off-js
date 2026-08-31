@@ -30,21 +30,20 @@ ParentRefSelector
 NormalSelector
   // 数组捕获可携带取值过程（attr/node 等），使列表模式能抽取属性值或保留 DOM 节点：
   // 例如 `a $url attr(href) { }` 累积每个 a 的 href；`div $node node { }` 累积 DOM 节点。
-  // 该分支优先于下方「数组捕获无过程」分支尝试，二者对 `tr $row { }` 产出一致，不会歧义。
+  //
+  // 本分支要求「数组捕获 + 取值过程（+ 可选子块）」全部出现：
+  // 裸 `$name`（无过程、无块）会在此分支失败并正常回退，交给下方标量过程分支解析。
+  // 必须用语法回溯而非在 action 里返回 peg$FAILED——peggy 5 中 action 返回 peg$FAILED
+  // 不会回退 peg$currPos，导致本规则后续分支从错误位置解析、整条规则误判失败。
   = sections:SectionList
     __ arrayCapture:ArrayCapture
-    __ procedure:Procedure?
+    __ procedure:Procedure
     __ children:ChildrenSelectors?
     SelectorEnd? {
-    // 仅当携带取值过程或子块时才视为数组捕获；裸 `$name`（无过程、无块）
-    // 必须回落到下方标量过程分支，避免与标量捕获 `$name` 歧义。
-    if (procedure === null && children === null) {
-      return peg$FAILED;
-    }
     return {
       type: 'normal-selector',
       sections,
-      procedure: procedure || null,
+      procedure,
       arrayCapture,
       children: children || [],
     }
@@ -140,47 +139,23 @@ SnippetExpand
     }
   }
 
-// 定义声明：filter / modifier / procedure 同形，code 与 argsPart 为纯文本且永不执行
+// 定义声明：filter / modifier / procedure 同形，code 与 argsPart 为纯文本且永不执行。
+// 定义声明：filter / modifier / procedure 同形，code 与 argsPart 为纯文本且永不执行。
+// 三规则各自声明关键字与 type 后缀，action 收敛到 grammar 初始化器的 buildDefine 工厂，
+// 消除三份重复实现（peggy 5 不支持带参规则，故无法用 Rule(param) 语法去重）。
 FilterDefine
-  = 'filter'
-    __ name:IdentifierName
-    __ argsPart:JSFunctionArgsPart
-    __ code:CodeBlock
-    SelectorEnd? {
-    return {
-      type: 'filter-define',
-      name,
-      argsPart,
-      code,
-    }
+  = 'filter' __ name:IdentifierName __ argsPart:JSFunctionArgsPart __ code:CodeBlock SelectorEnd? {
+    return buildDefine('filter', name, argsPart, code)
   }
 
 ModifierDefine
-  = 'modifier'
-    __ name:IdentifierName
-    __ argsPart:JSFunctionArgsPart
-    __ code:CodeBlock
-    SelectorEnd? {
-    return {
-      type: 'modifier-define',
-      name,
-      argsPart,
-      code,
-    }
+  = 'modifier' __ name:IdentifierName __ argsPart:JSFunctionArgsPart __ code:CodeBlock SelectorEnd? {
+    return buildDefine('modifier', name, argsPart, code)
   }
 
 ProcedureDefine
-  = 'procedure'
-    __ name:IdentifierName
-    __ argsPart:JSFunctionArgsPart
-    __ code:CodeBlock
-    SelectorEnd? {
-    return {
-      type: 'procedure-define',
-      name,
-      argsPart,
-      code,
-    }
+  = 'procedure' __ name:IdentifierName __ argsPart:JSFunctionArgsPart __ code:CodeBlock SelectorEnd? {
+    return buildDefine('procedure', name, argsPart, code)
   }
 
 // 子选择器集合：`{ ... }`，可空
@@ -194,5 +169,3 @@ ChildrenSelectors
 
 Separator = ';'
 SelectorEnd = __ ';'
-OptionalExtraComma = (__ ',')?
-OptionalExtraSeperator = (__ ';')?

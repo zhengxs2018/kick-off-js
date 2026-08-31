@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreDependencies": ["mitata"],
+  "ignoreBinaries": ["tsc", "oxlint", "oxfmt", "knip", "rimraf", "clean-publish"],
+  "ignoreFiles": []
+}

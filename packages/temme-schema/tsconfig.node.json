@@ -2,28 +2,23 @@
   "compilerOptions": {
     "target": "ES2025",
     "module": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["node"],
-    "rootDir": "src",
-    "outDir": "dist",
-    "declaration": true,
+    "lib": ["ESNext", "ES2025", "DOM"],
+    "types": ["node", "bun"],
     /* Bundler mode */
+    "rootDirs": ["src", "bench", "tests"],
     "moduleResolution": "bundler",
     "moduleDetection": "force",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
-    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "noEmit": true,
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noUncheckedIndexedAccess": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "exactOptionalPropertyTypes": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "bench/**/*.ts", "build.ts"]
 }

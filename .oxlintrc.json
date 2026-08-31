@@ -12,6 +12,13 @@
     "**/tests/**",
     "**/coverage/**",
     "**/samples/**",
-    "**/*.js"
+    "**/bench/**",
+    "**/*.js",
+    ".oxfmtrc.json",
+    ".oxlintrc.json",
+    "package.json",
+    "bun.lockb",
+    "tsconfig.json",
+    "tsconfig.*.json"
   ],
 }
