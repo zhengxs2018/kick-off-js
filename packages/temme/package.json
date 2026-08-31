@@ -24,7 +24,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/",
+    "registry": "https://registry.npmjs.com",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
@@ -73,7 +73,7 @@
     "check": "tsc --noEmit -p tsconfig.build.json && knip --config ./knip.config.json",
     "clean": "rimraf node_modules && bun run clean:bundle",
     "clean:bundle": "rimraf dist package",
-    "prepublishOnly": "bun run lint && bun run check && bun run build && clean-publish",
+    "prepublishOnly": "bun run lint && bun run check && bun run build && bun x clean-publish",
     "postpublish": "rimraf package"
   },
   "dependencies": {
@@ -81,7 +81,9 @@
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",
+    "clean-publish": "^5.2.0",
     "jsdom": "^30.0.1",
-    "peggy": "^5.1.0"
+    "peggy": "^5.1.0",
+    "rimraf": "^6.1.3"
   }
 }
