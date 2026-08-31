@@ -13,7 +13,7 @@ export interface Emitter extends Disposable {
 }
 
 export function createEmitter(): Emitter {
-  const listeners = new Map<string, Listener[]>();
+  const listeners = new Map<string, Set<Listener>>();
 
   const emitter: Emitter = {
     on,
@@ -26,7 +26,7 @@ export function createEmitter(): Emitter {
   return emitter;
 
   function on(event: string, listener: Listener, options?: EmitterOptions): Disposable {
-    const bucket = listeners.getOrInsertComputed(event, () => []);
+    const bucket = listeners.getOrInsertComputed(event, () => new Set<Listener>());
 
     if (options?.once) {
       const subscription = register(bucket, event, data => {
@@ -39,14 +39,13 @@ export function createEmitter(): Emitter {
     return register(bucket, event, listener);
   }
 
-  function register(bucket: Listener[], event: string, handler: Listener): Disposable {
-    bucket.push(handler);
+  function register(bucket: Set<Listener>, event: string, handler: Listener): Disposable {
+    bucket.add(handler);
 
     return {
       [Symbol.dispose]() {
-        const index = bucket.indexOf(handler);
-        if (index >= 0) bucket.splice(index, 1);
-        if (bucket.length === 0) listeners.delete(event);
+        bucket.delete(handler);
+        if (bucket.size === 0) listeners.delete(event);
       },
     };
   }
@@ -55,7 +54,7 @@ export function createEmitter(): Emitter {
     const bucket = listeners.get(event);
     if (!bucket) return;
 
-    for (const listener of [...bucket]) {
+    for (const listener of new Set(bucket)) {
       listener(data);
     }
   }

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { z } from 'zod';
 
-import { createRpcHost } from '../core/host.js';
-import type { RpcRequest } from '../core/schema.js';
+import { createRpcHost } from '../../src/core/host.js';
+import type { RpcRequest } from '../../src/core/schema.js';
 
 function request(partial: Partial<RpcRequest> & Pick<RpcRequest, 'method'>): RpcRequest {
   return {

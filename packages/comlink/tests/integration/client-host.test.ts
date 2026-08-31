@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { z } from 'zod';
 
-import { createRpcClient } from '../core/client.js';
-import { createRpcHost } from '../core/host.js';
-import { RpcError } from '../core/error.js';
-import type { RpcClient, RpcHost } from '../core/index.js';
-import type { RpcEvent, RpcRequest } from '../core/schema.js';
-import { isRpcEventMethod, RPC_EVENT_PREFIX } from '../core/schema.js';
-import { isObject } from '../common/util.js';
-import type { RpcTransport } from '../core/transport.js';
+import { createRpcClient } from '../../src/core/client.js';
+import { createRpcHost } from '../../src/core/host.js';
+import { RpcError } from '../../src/core/error.js';
+import type { RpcClient, RpcHost } from '../../src/core/index.js';
+import type { RpcEvent, RpcRequest } from '../../src/core/schema.js';
+import { isRpcEventMethod, RPC_EVENT_PREFIX } from '../../src/core/schema.js';
+import { isObject } from '../../src/common/util.js';
+import type { RpcTransport } from '../../src/core/transport.js';
 
 import { createMemoryPipe } from '../helpers/memory-transport.js';
 

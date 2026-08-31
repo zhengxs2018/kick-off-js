@@ -1,42 +1,51 @@
 {
   "name": "@zhengxs/comlink",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
-    },
-    "./web": {
-      "types": "./src/web.ts",
-      "default": "./src/web.ts"
-    }
+    "./package.json": "./package.json",
+    "./web": "./src/web.ts",
+    ".": "./src/index.ts"
   },
   "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.com",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
+      "./package.json": "./package.json",
       "./web": {
         "types": "./dist/web.d.ts",
         "default": "./dist/web.js"
+      },
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       }
     }
   },
   "scripts": {
-    "build": "tsc -b -p tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.node.json",
+    "build": "tsc -p tsconfig.build.json",
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "bench": "bun run ./bench/comlink.bench.ts"
+    "test:cov": "bun test --coverage --coverage-reporter=text --coverage-reporter=lcov --coverage-dir=coverage --reporter=junit --reporter-outfile=coverage/junit.xml",
+    "bench": "bun run bench/extractor.bench.ts",
+    "lint": "oxlint --type-aware --type-check",
+    "lint:fix": "oxlint --type-aware --type-check --fix",
+    "format": "oxfmt",
+    "check": "tsc --noEmit -p tsconfig.build.json && knip --config ./knip.config.json",
+    "clean": "rimraf node_modules && bun run clean:bundle",
+    "clean:bundle": "rimraf dist package",
+    "prepublishOnly": "bun run lint && bun run check && bun run build && clean-publish",
+    "postpublish": "rimraf package"
   },
   "dependencies": {
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "clean-publish": "^5.2.0",
+    "rimraf": "^6.1.3"
   }
 }

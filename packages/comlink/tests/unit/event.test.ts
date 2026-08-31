@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { disposeAll } from '../common/event.js';
+import { disposeAll } from '../../src/common/event.js';
 
 class Tracked implements Disposable {
   disposed = false;

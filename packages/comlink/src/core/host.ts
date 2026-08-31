@@ -93,7 +93,13 @@ export function createRpcHost(): RpcHost {
       if (error instanceof RpcError) {
         return buildError(request.id, error.code, error.message, error.data);
       }
-      return buildError(request.id, -32000, error.message);
+      // 普通 Error 若携带数值型 `code`（应用自定义 JSON-RPC 错误码），透传之；
+      // 否则回退到通用 Server error。
+      const code =
+        typeof (error as Error & { code?: unknown }).code === 'number'
+          ? ((error as Error & { code: number }).code as number)
+          : -32000;
+      return buildError(request.id, code, error.message);
     }
   }
 

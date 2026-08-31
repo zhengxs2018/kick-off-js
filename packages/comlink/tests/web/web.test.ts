@@ -1,10 +1,15 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
 import { z } from 'zod';
 
-import { createWebRpc, WEBRPC_EVENT_OPEN, WEBRPC_EVENT_CLOSE, type WebRpcEvent } from '../web.js';
-import type { WebRpc } from '../web.js';
-import { WEB_RPC_PROBE_FLAG, rpcEvent } from '../core/index.js';
-import type { RpcTransport } from '../core/index.js';
+import {
+  createWebRpc,
+  WEBRPC_EVENT_OPEN,
+  WEBRPC_EVENT_CLOSE,
+  type WebRpcEvent,
+} from '../../src/web.js';
+import type { WebRpc } from '../../src/web.js';
+import { WEB_RPC_PROBE_FLAG, rpcEvent } from '../../src/core/index.js';
+import type { RpcTransport } from '../../src/core/index.js';
 
 import { getWindow } from './setup.js';
 

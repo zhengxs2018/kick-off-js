@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { createPendingQueue } from '../common/queue.js';
+import { createPendingQueue } from '../../src/common/queue.js';
 
 describe('createPendingQueue', () => {
   test('create returns a pending task with unique id', () => {

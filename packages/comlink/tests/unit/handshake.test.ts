@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { handshakeHello, isHandshakeHello, WEB_RPC_PROBE_FLAG } from '../core/handshake.js';
+import { handshakeHello, isHandshakeHello, WEB_RPC_PROBE_FLAG } from '../../src/core/handshake.js';
 
 describe('handshakeHello', () => {
   test('produces a valid handshake envelope', () => {
